@@ -12,7 +12,7 @@
  *
  * @return The PROCESSENTRY32 struct of the process if found.
  */
-static std::optional<PROCESSENTRY32> FindProcessInSnapshot(HANDLE hSnap, const wchar_t* name)
+static std::optional<PROCESSENTRY32> FindProcessInSnapshot(HANDLE hSnap, const wchar_t* name) 
 {
 	// PROCESSENTRY32: an entry of the processes in the address space of the snapshot.
 	// Essentially a buffer to later push each process into, which is why we need to set
@@ -20,7 +20,7 @@ static std::optional<PROCESSENTRY32> FindProcessInSnapshot(HANDLE hSnap, const w
 	PROCESSENTRY32 currProcess;
 	currProcess.dwSize = sizeof(currProcess);
 
-	if (!Process32First(hSnap, &currProcess))
+	if (!Process32First(hSnap, &currProcess)) 
 	{
 		std::cout << "Process32First failed. Error: " << GetLastError() << "\n";
 		return std::nullopt;
@@ -28,7 +28,7 @@ static std::optional<PROCESSENTRY32> FindProcessInSnapshot(HANDLE hSnap, const w
 
 	// Repeatedly push the next process in the snapshot into the variable
 	// And check whether we found the target process.
-	do
+	do 
 	{
 		if (!_wcsicmp(currProcess.szExeFile, name)) return currProcess;
 	} while (Process32Next(hSnap, &currProcess));
@@ -44,7 +44,7 @@ static std::optional<PROCESSENTRY32> FindProcessInSnapshot(HANDLE hSnap, const w
  *
  * @return The MODULEENTRY32 struct of the module if found.
  */
-static std::optional<MODULEENTRY32> FindModuleInSnapshot(HANDLE hSnap, const wchar_t* name)
+static std::optional<MODULEENTRY32> FindModuleInSnapshot(HANDLE hSnap, const wchar_t* name) 
 {
 	// MODULEENTRY32: an entry of the modules in the address space of the snapshot.
 	// Essentially a buffer to later push each module into, which is why we need to set
@@ -52,15 +52,16 @@ static std::optional<MODULEENTRY32> FindModuleInSnapshot(HANDLE hSnap, const wch
 	MODULEENTRY32 currModule;
 	currModule.dwSize = sizeof(currModule);
 
-	if (!Module32First(hSnap, &currModule))
+	if (!Module32First(hSnap, &currModule)) 
 	{
 		std::cout << "Module32First failed. Error: " << GetLastError() << "\n";
 		return std::nullopt;
 	}
 	// Repeatedly push the next module in the snapshot into the variable
 	// And check whether we found the target module.
-	do
+	do 
 	{
+		std::wcout << currModule.szModule << "\n";
 		if (!_wcsicmp(currModule.szModule, name)) return currModule;
 	} while (Module32Next(hSnap, &currModule));
 
@@ -81,12 +82,15 @@ DWORD GetProcessID(const wchar_t* name)
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	std::optional<PROCESSENTRY32> proc = std::nullopt;
 
-	if (hSnap != INVALID_HANDLE_VALUE) 
+	if (hSnap == INVALID_HANDLE_VALUE) 
+	{
+		std::cout << "[+] ERROR GetProcessID: CreateToolhelp32Snapshot - invalid handle." << "\n";
+	}
+	else 
 	{
 		proc = FindProcessInSnapshot(hSnap, name);
+		CloseHandle(hSnap);
 	}
-
-	CloseHandle(hSnap);
 	return proc == std::nullopt ? 0 : proc->th32ProcessID;
 }
 
@@ -105,12 +109,15 @@ uintptr_t GetModuleBaseAddress(DWORD pid, const wchar_t* name)
 	HANDLE hSnap = CreateToolhelp32Snapshot(dwFlags, pid);
 	std::optional<MODULEENTRY32> mod = std::nullopt;
 
-	if (hSnap != INVALID_HANDLE_VALUE)
+	if (hSnap == INVALID_HANDLE_VALUE) 
+	{
+		std::cout << "[+] ERROR GetProcessID: CreateToolhelp32Snapshot - invalid handle." << "\n";
+	}
+	else 
 	{
 		mod = FindModuleInSnapshot(hSnap, name);
+		CloseHandle(hSnap);
 	}
-
-	CloseHandle(hSnap);
 	return mod == std::nullopt ? 0 : reinterpret_cast<uintptr_t>(mod->modBaseAddr);
 };
 
