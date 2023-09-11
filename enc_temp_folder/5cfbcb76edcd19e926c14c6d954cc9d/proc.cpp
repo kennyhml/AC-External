@@ -90,15 +90,7 @@ DWORD GetProcessID(const wchar_t* name)
 	return processID;
 }
 
-/**
- * Gets the base address of a given module by name.
- * Name must be passed as a wide-char as MODULEENTRY32 stores it's as such.
- *
- * @param name The name of the target module.
- *
- * @return The base address if the module exists, else 0.
- */
-uintptr_t GetModuleBaseAddress(DWORD pid, const wchar_t* name)
+uintptr_t GetModuleBaseAddress(DWORD pid, const wchar_t* name) 
 {
 	// TH32CS_SNAPMODULE alone will exclude 32-bit modules on a 64-bit process
 	DWORD dwFlags = TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32;
