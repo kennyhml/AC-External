@@ -1,9 +1,17 @@
 
-#include <iostream>
+#include "proc.h"
+#include <iostream> 
 
 
 int main()
 {
-	std::cout << "Test" << std::endl;
+
+	DWORD addy = getProcessID(L"ac_client.exe");
+
 	std::cin.get();
+
+
+
+
+
 }
