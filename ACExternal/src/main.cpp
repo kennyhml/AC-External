@@ -9,7 +9,7 @@ int main()
 	uintptr_t addr = GetModuleBaseAddress(pid, L"ac_client.exe");
 
 	std::cout << "[+] Client PID: " << pid << "\n";
-	std::cout << "[+] Module base address: " << addr << "\n";
+	std::cout << "[+] Module base address: 0x" << std::hex << addr << "\n";
 
 
 	std::cin.get();
