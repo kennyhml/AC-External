@@ -151,11 +151,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\offsets.cpp" />
+    <ClCompile Include="src\geometry.cpp" />
+    <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\mem.cpp" />
     <ClCompile Include="src\proc.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\geometry.h" />
+    <ClInclude Include="src\offsets.h" />
+    <ClInclude Include="src\player.h" />
+    <ClInclude Include="src\mem.h" />
     <ClInclude Include="src\proc.h" />
+    <ClInclude Include="src\stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
