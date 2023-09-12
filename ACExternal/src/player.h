@@ -7,11 +7,8 @@
 enum PlayerState { ALIVE, DEAD, SPECTATOR };
 
 
-class Player
+struct Player
 {
-
-public:
-
 	Player(uintptr_t baseAddress, HANDLE hProcess)
 		: baseAddress(baseAddress) {
 	
