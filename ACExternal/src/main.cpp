@@ -6,8 +6,19 @@
 
 #include "proc.h"
 #include "player.h"
-#include "offsets.h"
 
+namespace staticOffsets {
+
+	int entityList = 0x10F4F8;
+	int localPlayer = 0x10F4F4;
+	int playerCount = 0x10F500;
+
+	int speedW = 0x5BEA0;
+	int speedA = 0x5BE40;
+	int speedS = 0x5BF00;
+	int speedD = 0x5BF60;
+
+}
 
 Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddr)
 {
@@ -23,8 +34,8 @@ Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddr)
 std::vector<Player> GetPlayers(HANDLE hProcess, uintptr_t modBaseAddr)
 {
 
-	uintptr_t playerCountPtr = modBaseAddr + offsets::playerCount;
-	uintptr_t entityListPtr = modBaseAddr + offsets::entityList;
+	uintptr_t playerCountPtr = modBaseAddr + staticOffsets::playerCount;
+	uintptr_t entityListPtr = modBaseAddr + staticOffsets::entityList;
 
 	int playerCount = 0;
 	ReadProcessMemory(hProcess, (BYTE*)playerCountPtr, &playerCount, sizeof(playerCount), nullptr);
