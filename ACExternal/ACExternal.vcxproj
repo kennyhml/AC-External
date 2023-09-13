@@ -156,6 +156,7 @@
     <ClCompile Include="src\mem.cpp" />
     <ClCompile Include="src\proc.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\geometry.h" />

@@ -3,7 +3,6 @@
 #include "geometry.h"
 #include <string>
 #include "stdafx.h"
-#include "weapon.h"
 
 enum class MovementFlags : int32_t
 {
@@ -34,16 +33,16 @@ enum class Status : int32_t
 struct Player
 {
 	uint32_t* vTable; //0x0000
-	Vector3 headPos; //0x0004
-	Vector3 velocity; //0x0010
-	IntVector3 directionalMove; //0x001C
-	Vector3 readableSpeed; //0x0028
-	Vector3 feedPs; //0x0034
-	Vector3 viewAngle; //0x0040
+	struct Vector3 headPos; //0x0004
+	struct Vector3 velocity; //0x0010
+	struct IntVector3 directionalMove; //0x001C
+	struct Vector3 readableSpeed; //0x0028
+	struct Vector3 feedPs; //0x0034
+	struct Vector3 viewAngle; //0x0040
 	char pad_004C[4]; //0x004C
 	float characterSpeed; //0x0050
 	char pad_0054[4]; //0x0054
-	Collider colldier; //0x0058
+	struct Collider colldier; //0x0058
 	int16_t isOnGround; //0x0068
 	char pad_006A[6]; //0x006A
 	bool isIdle; //0x0070
@@ -51,7 +50,7 @@ struct Player
 	char pad_0072[6]; //0x0072
 	float zPreJump; //0x0078
 	char pad_007C[4]; //0x007C
-	MovementFlags movementFlags; //0x0080
+	enum MovementFlags movementFlags; //0x0080
 	char pad_0084[116]; //0x0084
 	int32_t health; //0x00F8
 	int32_t armor; //0x00FC
@@ -75,23 +74,23 @@ struct Player
 	char pad_0235[247]; //0x0235
 	Team team; //0x032C
 	char pad_0330[8]; //0x0330
-	Status status; //0x0338
+	enum Status status; //0x0338
 	char pad_033C[12]; //0x033C
-	Weapon* knife; //0x0348
-	Weapon* pistol; //0x034C
-	Weapon* carbine; //0x0350
-	Weapon* shotgun; //0x0354
-	Weapon* subgun; //0x0358
-	Weapon* sniper; //0x035C
-	Weapon* assaultRifle; //0x0360
-	Weapon* cPistol; //0x0364
-	Weapon* grenade; //0x0368
-	Weapon* akimboPistol; //0x036C
-	Weapon* previousWeapon; //0x0370
-	Weapon* sCurrentWeapon; //0x0374
-	Weapon* fCurrentWeapon; //0x0378
-	Weapon* spawnWeapon; //0x037C
-	Weapon* nextSpawnWeapon; //0x0380
-	Weapon* lastShotWeapon; //0x0384
+	struct Weapon* knife; //0x0348
+	struct Weapon* pistol; //0x034C
+	struct Weapon* carbine; //0x0350
+	struct Weapon* shotgun; //0x0354
+	struct Weapon* subgun; //0x0358
+	struct Weapon* sniper; //0x035C
+	struct Weapon* assaultRifle; //0x0360
+	struct Weapon* cPistol; //0x0364
+	struct Weapon* grenade; //0x0368
+	struct Weapon* akimboPistol; //0x036C
+	struct Weapon* previousWeapon; //0x0370
+	struct Weapon* sCurrentWeapon; //0x0374
+	struct Weapon* fCurrentWeapon; //0x0378
+	struct Weapon* spawnWeapon; //0x037C
+	struct Weapon* nextSpawnWeapon; //0x0380
+	struct Weapon* lastShotWeapon; //0x0384
 	char pad_0388[4]; //0x0388
 };
