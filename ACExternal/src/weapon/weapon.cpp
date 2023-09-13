@@ -1,61 +1,20 @@
 
 #include "weapon.h"
-#include "mem.h"
+#include "../mem.h"
 
 template <typename T>
+
+/**
+ * Gets the size of the object minus the size of a uintptr_t as we use a uintptr_t to
+ * store the address of the object in memory for ease of modifying it.
+ *
+ * The size of a uintptr_t is platform dependent, hence this helper function.
+ *
+ * @param instance The instance of the object to get the size of
+ *
+ * @return The size of the object - the size of a uintptr_t
+ */
 size_t getSize(const T& instance) { return sizeof(instance) - sizeof(uintptr_t); }
-
-
-void WeaponData::setReloadTime(HANDLE hProcess, int16_t reloadTime) 
-{
-	PatchEx((BYTE*)(baseAddress + 0x0108), (BYTE*)&reloadTime, sizeof(reloadTime), hProcess);
-}
-
-void WeaponData::setFireRate(HANDLE hProcess, int16_t fireRate)
-{
-
-}
-
-void WeaponData::setDamage(HANDLE hProcess, int16_t damage)
-{
-
-}
-
-void WeaponData::setMagSize(HANDLE hProcess, int16_t magSize)
-{
-
-}
-
-void WeaponData::toggleBulletSpread(HANDLE hProcess, bool bulletSpread)
-{
-
-}
-
-void WeaponData::toggleRecoil(HANDLE hProcess, bool recoil)
-{
-
-}
-
-void WeaponData::toggleWeaponShake(HANDLE hProcess, bool weaponShake)
-{
-
-}
-
-void WeaponData::toggleAutomatic(HANDLE hProcess, bool automatic)
-{
-
-}
-
-
-void ReserveData::setReserveAmmo(HANDLE hProcess, int32_t reserveAmmo)
-{
-
-}
-void ReserveData::setAmmo(HANDLE hProcess, int32_t ammo)
-{
-
-}
-
 
 
 /**

@@ -151,20 +151,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\weapon\reserveData.cpp" />
     <ClCompile Include="src\geometry.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\mem.cpp" />
     <ClCompile Include="src\proc.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\weapon.cpp" />
+    <ClCompile Include="src\weapon\weapon.cpp" />
+    <ClCompile Include="src\weapon\weaponData.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\weapon\reserveData.h" />
     <ClInclude Include="src\geometry.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\mem.h" />
     <ClInclude Include="src\proc.h" />
     <ClInclude Include="src\stdafx.h" />
-    <ClInclude Include="src\weapon.h" />
+    <ClInclude Include="src\weapon\weapon.h" />
+    <ClInclude Include="src\weapon\weaponData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

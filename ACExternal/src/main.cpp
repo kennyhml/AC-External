@@ -6,7 +6,7 @@
 
 #include "proc.h"
 #include "player.h"
-#include "weapon.h"
+#include "weapon/weapon.h"
 
 
 namespace staticOffsets {
@@ -68,10 +68,13 @@ int main()
 
 	HANDLE hProcess = 0;
 	hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, pid);
-	Weapon wp = LoadWeapon(hProcess, 0x01191B90);
+	Weapon wp = LoadWeapon(hProcess, 0x00DA1B90);
+
+	wp.data->setReloadTime(hProcess, 2000);
+	wp.data->setFireCooldown(hProcess, 120);
 
 
-	wp.data->setReloadTime(hProcess, 0);
+	wp.data->toggleAutomatic(hProcess, false);
 
 
 	// Player localPlayer = LoadPlayer(hProcess, FindDMAAddy(hProcess, moduleBaseAddr + 0x10F4F4, { 0x0 }));
