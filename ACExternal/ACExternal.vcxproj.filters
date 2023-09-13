@@ -47,5 +47,8 @@
     <ClInclude Include="src\geometry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\weapon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
