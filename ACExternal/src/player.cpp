@@ -11,19 +11,12 @@ namespace offsets
 	int moveFlag = 0x80;
 	int nameO = 0x225;
 	int status = 0x338;
-}
-
-namespace instructionOffsets
-{
 	int speedW = 0x5BEA1; // positive forwards
 	int speedA = 0x5BF01; // positive sidewards
 	int speedS = 0x5BE41; // negative forwards
 	int speedD = 0x5BF61; // negative sidewards
 
-	int fallSpeed = 0x5B285; // determined how quick we fall
-	int dealDamage = 0x29D1F;
 }
-
 
 /**
  * @brief Loads a player at a given memory address, including it's weapons.
@@ -176,18 +169,13 @@ void Player::toggleGhostmode(HANDLE hProcess, bool ghostMode)
  */
 void ToggleSpeedHack(HANDLE hProcess, uintptr_t modBaseAddress, bool speedHack)
 {
-	uintptr_t instructionW = modBaseAddress + instructionOffsets::speedW;
-	uintptr_t instructionA = modBaseAddress + instructionOffsets::speedA;
-	uintptr_t instructionS = modBaseAddress + instructionOffsets::speedS;
-	uintptr_t instructionD = modBaseAddress + instructionOffsets::speedD;
+	int32_t speed = speedHack ? 3 : 1;
+	PatchEx((BYTE*)modBaseAddress + offsets::speedW, (BYTE*)&speed, 4, hProcess);
+	PatchEx((BYTE*)modBaseAddress + offsets::speedA, (BYTE*)&speed, 4, hProcess);
 
-	int32_t WASpeed = speedHack ? 3 : 1;
-	PatchEx((BYTE*)instructionW, (BYTE*)&WASpeed, 4, hProcess);
-	PatchEx((BYTE*)instructionA, (BYTE*)&WASpeed, 4, hProcess);
-
-	int32_t SDSpeed = speedHack ? -3 : -1;
-	PatchEx((BYTE*)instructionS, (BYTE*)&SDSpeed, 4, hProcess);
-	PatchEx((BYTE*)instructionD, (BYTE*)&SDSpeed, 4, hProcess);
+	speed = speed * -1;
+	PatchEx((BYTE*)modBaseAddress + offsets::speedS, (BYTE*)&speed, 4, hProcess);
+	PatchEx((BYTE*)modBaseAddress + offsets::speedD, (BYTE*)&speed, 4, hProcess);
 }
 
 /**
@@ -199,13 +187,15 @@ void ToggleSpeedHack(HANDLE hProcess, uintptr_t modBaseAddress, bool speedHack)
  */
 void ToggleAntiGravtiy(HANDLE hProcess, uintptr_t modBaseAddress, bool antiGravity)
 {
-	uintptr_t instructionAddress = modBaseAddress + instructionOffsets::fallSpeed;
+	uintptr_t instructionAddress = modBaseAddress + 0x5B285;
 	if (antiGravity)
 	{
+		// Write NOPs into the address to prevent the fall speed from increasing
 		NopEx((BYTE*)instructionAddress, 3, hProcess);
 	}
 	else
-	{
+	{	
+		// Write 'add [ebx+54],exc' back into the instruction address
 		PatchEx((BYTE*)instructionAddress, (BYTE*)"\x01\x4B\x54", 3, hProcess);
 	}
 };

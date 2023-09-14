@@ -45,5 +45,5 @@ int main()
 
 	}
 
-	ToggleAntiGravtiy(hProcess, moduleBaseAddr, false);
+	ToggleSpeedHack(hProcess, moduleBaseAddr, true);
 }
