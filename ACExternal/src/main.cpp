@@ -20,42 +20,9 @@ namespace staticOffsets {
 	int speedS = 0x5BF00;
 	int speedD = 0x5BF60;
 
-}
+	int dmg = 0x29D1F;
 
-Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddress)
-{
-	Player player;
-	ReadProcessMemory(hProcess, (BYTE*)playerAddress, &player, sizeof(Player), nullptr);
-	return player;
 
-}
-
-std::vector<Player> GetPlayers(HANDLE hProcess, uintptr_t modBaseAddr)
-{
-
-	uintptr_t playerCountPtr = modBaseAddr + staticOffsets::playerCount;
-	uintptr_t entityListPtr = modBaseAddr + staticOffsets::entityList;
-
-	int playerCount = 0;
-	ReadProcessMemory(hProcess, (BYTE*)playerCountPtr, &playerCount, sizeof(playerCount), nullptr);
-	std::cout << "[+] Current player count: " << std::dec << playerCount << "\n";
-	playerCount--;
-
-	uintptr_t entityListAddr;
-	std::vector<Player> players(playerCount);
-
-	ReadProcessMemory(hProcess, (BYTE*)entityListPtr, &entityListAddr, sizeof(entityListAddr), nullptr);
-	std::cout << "[+] Entity list at " << std::hex << entityListAddr << "\n";
-
-	for (int i = 1; i < playerCount + 1; i++)
-	{
-		int offset = 4 * i;
-		uintptr_t playerAddress;
-		ReadProcessMemory(hProcess, (BYTE*)entityListAddr + offset, &playerAddress, sizeof(playerAddress), nullptr);
-		players.push_back(LoadPlayer(hProcess, playerAddress));
-	}
-
-	return players;
 }
 
 int main()
@@ -68,19 +35,16 @@ int main()
 
 	HANDLE hProcess = 0;
 	hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, pid);
-	Weapon wp = LoadWeapon(hProcess, 0x00DA1B90);
-
-	wp.data->setReloadTime(hProcess, 2000);
-	wp.data->setFireCooldown(hProcess, 120);
 
 
-	wp.data->toggleAutomatic(hProcess, false);
+	uintptr_t localPlayerAddr = FindDMAAddy(hProcess, moduleBaseAddr + 0x10F4F4, { 0x0 });
+	Player localPlayer = LoadPlayer(hProcess, localPlayerAddr);
 
+	localPlayer.setHealth(hProcess, -8989);
+	localPlayer.setArmor(hProcess, 101001);
 
-	// Player localPlayer = LoadPlayer(hProcess, FindDMAAddy(hProcess, moduleBaseAddr + 0x10F4F4, { 0x0 }));
-
-	// auto players = GetPlayers(hProcess, moduleBaseAddr);
-
+	char newName[16] = "Working easy";
+	localPlayer.setName(hProcess, newName);
 
 	std::cin.get();
 }

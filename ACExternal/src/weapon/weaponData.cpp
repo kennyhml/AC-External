@@ -1,7 +1,8 @@
 #include "weaponData.h"
 #include "../mem.h"
 
-namespace offsets {
+namespace offsets 
+{
 	int name = 0x0000;
 	int reloadTime = 0x0108;
 	int fireCooldown = 0x010A;

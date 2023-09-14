@@ -2,7 +2,8 @@
 #include "../mem.h"
 
 
-namespace offsets {
+namespace offsets 
+{
 	int reserveAmmo = 0x0000;
 	int ammo = 0x0028;
 	int cooldown = 0x0050;

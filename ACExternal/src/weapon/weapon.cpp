@@ -2,20 +2,8 @@
 #include "weapon.h"
 #include "../mem.h"
 
-template <typename T>
-
-/**
- * Gets the size of the object minus the size of a uintptr_t as we use a uintptr_t to
- * store the address of the object in memory for ease of modifying it.
- *
- * The size of a uintptr_t is platform dependent, hence this helper function.
- *
- * @param instance The instance of the object to get the size of
- *
- * @return The size of the object - the size of a uintptr_t
- */
-size_t getSize(const T& instance) { return sizeof(instance) - sizeof(uintptr_t); }
-
+// get size of uintptr_t so we can keep it as a buffer for the baseAddress in the objects
+const int s_uintptr = sizeof(uintptr_t);
 
 /**
  * Loads a weapon object at the given address, including the sub structures such as:
@@ -36,21 +24,21 @@ Weapon LoadWeapon(HANDLE hProcess, uintptr_t weaponAddress)
 	// Load the weapon first, this will provide us with the pointers to the weapon
 	// owner, the weapon data and the reserve (magazine) data.
 	Weapon weapon(weaponAddress);
-	ReadProcessMemory(hProcess, (BYTE*)weaponAddress, &weapon, getSize(weapon), nullptr);
+	ReadProcessMemory(hProcess, (BYTE*)weaponAddress, &weapon, sizeof(Weapon) - s_uintptr, nullptr);
 
 	// The weapon.owner currently only contains the address of the owner, now we load it
 	// and change the .owner pointer to the loaded object
-	Player* owner = new Player;
-	ReadProcessMemory(hProcess, (BYTE*)weapon.owner, &*owner, sizeof(Player), nullptr);
+	Player* owner = new Player((uintptr_t)weapon.owner);
+	ReadProcessMemory(hProcess, (BYTE*)weapon.owner, &*owner, sizeof(Player) - s_uintptr, nullptr);
 	weapon.owner = owner;
 
 	// Do the same we did for the owner for weaponData and reserveData
 	WeaponData* weaponData = new WeaponData((uintptr_t)weapon.data);
-	ReadProcessMemory(hProcess, (BYTE*)weapon.data, &*weaponData, getSize(weaponData), nullptr);
+	ReadProcessMemory(hProcess, (BYTE*)weapon.data, &*weaponData, sizeof(WeaponData) - s_uintptr, nullptr);
 	weapon.data = weaponData;
 
 	ReserveData* reserveData = new ReserveData((uintptr_t)weapon.reserveData);
-	ReadProcessMemory(hProcess, (BYTE*)weapon.reserveData, &*reserveData, getSize(reserveData), nullptr);
+	ReadProcessMemory(hProcess, (BYTE*)weapon.reserveData, &*reserveData, sizeof(ReserveData) - s_uintptr, nullptr);
 	weapon.reserveData = reserveData;
 
 	return weapon;
