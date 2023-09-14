@@ -8,21 +8,13 @@
 #include "player.h"
 #include "weapon/weapon.h"
 
-
 namespace staticOffsets {
 
 	int entityList = 0x10F4F8;
 	int localPlayer = 0x10F4F4;
 	int playerCount = 0x10F500;
 
-	int speedW = 0x5BEA0;
-	int speedA = 0x5BE40;
-	int speedS = 0x5BF00;
-	int speedD = 0x5BF60;
-
-	int dmg = 0x29D1F;
-
-
+	int dmgInstruction = 0x29D1F;
 }
 
 int main()
@@ -36,15 +28,22 @@ int main()
 	HANDLE hProcess = 0;
 	hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, pid);
 
-
-	uintptr_t localPlayerAddr = FindDMAAddy(hProcess, moduleBaseAddr + 0x10F4F4, { 0x0 });
+	uintptr_t entityListAddr = FindDMAAddy(hProcess, moduleBaseAddr + staticOffsets::entityList, { 0x0 });
+	uintptr_t localPlayerAddr = FindDMAAddy(hProcess, moduleBaseAddr + staticOffsets::localPlayer, { 0x0 });
+	intptr_t playerCountAddr = moduleBaseAddr + staticOffsets::playerCount;
 	Player localPlayer = LoadPlayer(hProcess, localPlayerAddr);
 
-	localPlayer.setHealth(hProcess, -8989);
-	localPlayer.setArmor(hProcess, 101001);
+	int playerCount;
+	ReadProcessMemory(hProcess, (BYTE*)playerCountAddr, (BYTE*)&playerCount, sizeof(playerCount), nullptr);
 
-	char newName[16] = "Working easy";
-	localPlayer.setName(hProcess, newName);
+	std::cout << "Player count: " << playerCount << "\n";
+	auto players = LoadPlayers(hProcess, playerCount, entityListAddr);
 
-	std::cin.get();
+	for (Player p : players)
+	{
+		std::cout << p.name << "\n";
+
+	}
+
+	ToggleAntiGravtiy(hProcess, moduleBaseAddr, false);
 }

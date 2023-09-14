@@ -7,6 +7,7 @@
 
 enum class MovementFlags : int32_t
 {
+	None = 0,
 	Forward = 1,
 	Back = 255,
 	Left = 256,
@@ -102,7 +103,6 @@ struct Player
 	void setName(HANDLE hProcess, char name[16]);
 
 	void toggleFlyHack(HANDLE hProcess, bool flyHack);
-	void toggleSpeedHack(HANDLE hProcess, bool speedHack);
 	void toggleGhostmode(HANDLE hProcess, bool ghostMode);
 
 private:
@@ -111,4 +111,6 @@ private:
 
 
 Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddress);
-std::vector<Player> GetPlayers(HANDLE hProcess, int playerCount, uintptr_t entityListAddr);
+std::vector<Player> LoadPlayers(HANDLE hProcess, int playerCount, uintptr_t entityListAddr);
+void ToggleAntiGravtiy(HANDLE hProcess, uintptr_t modBaseAddress, bool antiGravity);
+void ToggleSpeedHack(HANDLE hProcess, uintptr_t modBaseAddress, bool speedHack);
