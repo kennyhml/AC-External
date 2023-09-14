@@ -45,5 +45,5 @@ int main()
 
 	}
 
-	ToggleSpeedHack(hProcess, moduleBaseAddr, true);
+	ToggleSpeedHack(hProcess, moduleBaseAddr, false);
 }

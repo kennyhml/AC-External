@@ -58,17 +58,18 @@ Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddress)
 	// share the same weapon pointer and our player gets assigned a unique pointer.
 	// That way we can safely make our weapon op or make the enemies weapons useless without cross backfiring.
 	for (Weapon** weaponPtr : playerWeapons) {
-		*weaponPtr = new Weapon(LoadWeapon(hProcess, reinterpret_cast<uintptr_t>(*weaponPtr)));
+		*weaponPtr = new Weapon(LoadWeapon(hProcess, (uintptr_t)*weaponPtr));
 	}
 
 	return player;
 };
 
 /**
- * @brief Loads a player at a given memory address, including it's weapons.
+ * @brief Loads all players in the entity list, does not include the local player.
  *
  * @param hProcess A handle to the target process for memory modification.
- * @param playerAddress The address of the player to load.
+ * @param entityCount The amount of entities in the game, includes the local player.
+ * @param entityListAddr The memory address of the entity list to load the players from.
  */
 std::vector<Player> LoadPlayers(HANDLE hProcess, int entityCount, uintptr_t entityListAddr)
 {
@@ -77,8 +78,7 @@ std::vector<Player> LoadPlayers(HANDLE hProcess, int entityCount, uintptr_t enti
 	for (int i = 1; i < entityCount; i++)
 	{
 		int offset = 4 * i;
-		uintptr_t playerAddress;
-		ReadProcessMemory(hProcess, (BYTE*)entityListAddr + offset, &playerAddress, sizeof(playerAddress), nullptr);
+		uintptr_t playerAddress = FindDMAAddy(hProcess, entityListAddr + offset, { 0x0 });
 		Player player = LoadPlayer(hProcess, playerAddress);
 		players.push_back(player);
 	}
