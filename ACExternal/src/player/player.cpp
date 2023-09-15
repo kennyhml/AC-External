@@ -1,24 +1,7 @@
 #include "player.h"
-#include "mem.h"
-#include "weapon/weapon.h"
+#include "../mem.h"
+#include "../weapon/weapon.h"
 #include <array>
-
-namespace offsets
-{
-	int health = 0xF8;
-	int armor = 0xFC;
-	int team = 0x32C;
-	int moveFlag = 0x80;
-	int nameO = 0x225;
-	int status = 0x338;
-	int speedW = 0x5BEA1; // positive forwards
-	int speedA = 0x5BF01; // positive sidewards
-	int speedS = 0x5BE41; // negative forwards
-	int speedD = 0x5BF61; // negative sidewards
-
-	int sCurrentWeapon = 0x0374;
-	int fCurrentWeapon = 0x0378;
-}
 
 /**
  * @brief Loads a player at a given memory address, including it's weapons.
@@ -29,38 +12,8 @@ namespace offsets
 Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddress)
 {
 	Player player(playerAddress);
-	ReadProcessMemory(hProcess, (BYTE*)playerAddress, &player, sizeof(Player) - sizeof(uintptr_t), nullptr);
-
-	// Collect the pointers to all our weapon pointers in this player, so that we can later
-	// change the value to point to a proper loaded weapon object on the heap
-	std::array<Weapon**, 15> playerWeapons = {
-		&player.knife,
-		&player.pistol,
-		&player.carbine,
-		&player.shotgun,
-		&player.subgun,
-		&player.sniper,
-		&player.assaultRifle,
-		&player.cPistol,
-		&player.grenade,
-		&player.akimboPistol,
-		&player.previousWeapon,
-		&player.sCurrentWeapon,
-		&player.spawnWeapon,
-		&player.nextSpawnWeapon,
-		&player.lastShotWeapon
-	};
-
-	// Create all the weapon objects. The reason I want to load all of them is because it seems that
-	// not every entity has a unique weapon pointer assigned, including the local player.
-	// Meaning if we modify the stats of our local player weapon, we will also possibly modify the gun
-	// of some other entities.
-	// To ensure this doesnt happen, after loading all entities, I will make sure that all of them 
-	// share the same weapon pointer and our player gets assigned a unique pointer.
-	// That way we can safely make our weapon op or make the enemies weapons useless without cross backfiring.
-	for (Weapon** weaponPtr : playerWeapons) {
-		*weaponPtr = new Weapon(LoadWeapon(hProcess, (uintptr_t)*weaponPtr));
-	}
+	int size = sizeof(Player) - sizeof(uintptr_t);
+	ReadProcessMemory(hProcess, (BYTE*)playerAddress, &player, size, nullptr);
 	return player;
 };
 
@@ -71,18 +24,17 @@ Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddress)
  * @param entityCount The amount of entities in the game, includes the local player.
  * @param entityListAddr The memory address of the entity list to load the players from.
  */
-std::vector<Player> LoadPlayers(HANDLE hProcess, int entityCount, uintptr_t entityListAddr)
+std::vector<Player> LoadPlayers(HANDLE hProcess, int count, uintptr_t entityListAddr)
 {
 	std::vector<Player> players;
+	players.reserve(count);
 
-	for (int i = 1; i < entityCount; i++)
+	for (int i = 1; i < count; i++)
 	{
 		int offset = 4 * i;
 		uintptr_t playerAddress = FindDMAAddy(hProcess, entityListAddr + offset, { 0x0 });
-		Player player = LoadPlayer(hProcess, playerAddress);
-		players.push_back(player);
+		players.push_back(LoadPlayer(hProcess, playerAddress));
 	}
-
 	return players;
 }
 
@@ -94,7 +46,7 @@ std::vector<Player> LoadPlayers(HANDLE hProcess, int entityCount, uintptr_t enti
  */
 void Player::setHealth(HANDLE hProcess, int32_t health)
 {
-	uintptr_t targetAddress = baseAddress + offsets::health;
+	uintptr_t targetAddress = baseAddress + 0xF8;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&health, sizeof(health), hProcess);
 };
 
@@ -106,7 +58,7 @@ void Player::setHealth(HANDLE hProcess, int32_t health)
  */
 void Player::setArmor(HANDLE hProcess, int32_t armor)
 {
-	uintptr_t targetAddress = baseAddress + offsets::armor;
+	uintptr_t targetAddress = baseAddress + 0xFC;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&armor, sizeof(armor), hProcess);
 };
 
@@ -118,7 +70,7 @@ void Player::setArmor(HANDLE hProcess, int32_t armor)
  */
 void Player::setTeam(HANDLE hProcess, Team team)
 {
-	uintptr_t targetAddress = baseAddress + offsets::team;
+	uintptr_t targetAddress = baseAddress + 0x32C;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&team, sizeof(team), hProcess);
 }
 
@@ -130,37 +82,34 @@ void Player::setTeam(HANDLE hProcess, Team team)
  */
 void Player::setName(HANDLE hProcess, char name[16])
 {
-	uintptr_t targetAddress = baseAddress + offsets::nameO;
+	uintptr_t targetAddress = baseAddress + 0x225;
 	PatchEx((BYTE*)targetAddress, (BYTE*)name, strlen(name), hProcess);
 }
 
 void Player::setCurrentWeapon(HANDLE hProcess, const char* weapon)
 {
 	if (weapon == NULL) { return; }
-	Weapon* wp;
+	uintptr_t weaponPointer;
 
-	if (!strcmp(weapon, "Assault Rifle")) { wp = assaultRifle; }
-	else if (!strcmp(weapon, "Sniper Rifle")) { wp = sniper; }
-	else if (!strcmp(weapon, "Shotgun")) { wp = shotgun; }
-	else if (!strcmp(weapon, "Grenade")) { wp = grenade; }
-	else if (!strcmp(weapon, "Carbine")) { wp = carbine; }
-	else if (!strcmp(weapon, "Akimbo")) { wp = akimboPistol; }
+	if (!strcmp(weapon, "Assault Rifle")) { weaponPointer = assaultRiflePointer; }
+	else if (!strcmp(weapon, "Sniper Rifle")) { weaponPointer = sniperPointer; }
+	else if (!strcmp(weapon, "Shotgun")) { weaponPointer = shotgunPointer; }
+	else if (!strcmp(weapon, "Grenade")) { weaponPointer = grenadePointer; }
+	else if (!strcmp(weapon, "Carbine")) { weaponPointer = carbinePointer; }
+	else if (!strcmp(weapon, "Akimbo")) { weaponPointer = akimboPistolPointer; }
 	else {
 		throw std::runtime_error("Unknown weapon!");
 	}
 
-	if (wp->ID == sCurrentWeapon->ID) { return; }
+	if (weaponPointer == currentWeaponPointer) { return; }
 
-	previousWeapon = sCurrentWeapon;
-	sCurrentWeapon = wp;
-	uintptr_t targetAddress = baseAddress + offsets::sCurrentWeapon;
-	PatchEx((BYTE*)targetAddress, (BYTE*)&wp->baseAddress, sizeof(uintptr_t), hProcess);
+	previousWeaponPointer = currentWeaponPointer;
+	currentWeaponPointer = weaponPointer;
+
+	uintptr_t targetAddress = baseAddress + 0x0374;
+	PatchEx((BYTE*)targetAddress, (BYTE*)&currentWeaponPointer, sizeof(uintptr_t), hProcess);
 	std::cout << "[+] Gun has been switched to " << weapon << "!\n";
-
 }
-
-
-
 
 /**
  * @brief Enable/disable this player to fly.
@@ -172,7 +121,7 @@ void Player::toggleFlyHack(HANDLE hProcess, bool flyHack)
 {
 	if (flyHack != (status == Status::Spectate)) { return; }
 
-	uintptr_t targetAddress = baseAddress + offsets::status;
+	uintptr_t targetAddress = baseAddress + 0x338;
 	int value = flyHack ? (int)Status::Spectate : (int)Status::Alive;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&value, sizeof(value), hProcess);
 }
@@ -189,7 +138,7 @@ void Player::toggleGhostmode(HANDLE hProcess, bool ghostMode)
 	if ((int)movementFlag & (int)MovementFlags::NoClip && ghostMode) return;
 	if (!((int)movementFlag & (int)MovementFlags::NoClip) && !ghostMode) return;
 
-	uintptr_t targetAddress = baseAddress + offsets::moveFlag;
+	uintptr_t targetAddress = baseAddress + 0x80;
 	int value = ghostMode ? (int)movementFlag + (int)MovementFlags::NoClip : 0;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&value, sizeof(value), hProcess);
 
@@ -206,12 +155,12 @@ void Player::toggleGhostmode(HANDLE hProcess, bool ghostMode)
 void ToggleSpeedHack(HANDLE hProcess, uintptr_t modBaseAddress, uint8_t speed)
 {
 
-	PatchEx((BYTE*)modBaseAddress + offsets::speedW, (BYTE*)&speed, 4, hProcess);
-	PatchEx((BYTE*)modBaseAddress + offsets::speedA, (BYTE*)&speed, 4, hProcess);
+	PatchEx((BYTE*)modBaseAddress + 0x5BEA1, (BYTE*)&speed, 4, hProcess);
+	PatchEx((BYTE*)modBaseAddress + 0x5BF01, (BYTE*)&speed, 4, hProcess);
 
 	speed = speed * -1;
-	PatchEx((BYTE*)modBaseAddress + offsets::speedS, (BYTE*)&speed, 4, hProcess);
-	PatchEx((BYTE*)modBaseAddress + offsets::speedD, (BYTE*)&speed, 4, hProcess);
+	PatchEx((BYTE*)modBaseAddress + 0x5BE41, (BYTE*)&speed, 4, hProcess);
+	PatchEx((BYTE*)modBaseAddress + 0x5BF61, (BYTE*)&speed, 4, hProcess);
 }
 
 /**
@@ -230,7 +179,7 @@ void ToggleAntiGravtiy(HANDLE hProcess, uintptr_t modBaseAddress, bool antiGravi
 		NopEx((BYTE*)instructionAddress, 3, hProcess);
 	}
 	else
-	{	
+	{
 		// Write 'add [ebx+54],exc' back into the instruction address
 		PatchEx((BYTE*)instructionAddress, (BYTE*)"\x01\x4B\x54", 3, hProcess);
 	}

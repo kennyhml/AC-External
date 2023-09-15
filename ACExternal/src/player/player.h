@@ -12,12 +12,12 @@ struct Player
 		:baseAddress(baseAddress) {};
 
 	uint32_t vTable; //0x0000
-	struct Vector3 headPos; //0x0004
-	struct Vector3 velocity; //0x0010
-	struct IntVector3 directionalMove; //0x001C
-	struct Vector3 readableSpeed; //0x0028
-	struct Vector3 feetPos; //0x0034
-	struct Vector3 viewAngle; //0x0040
+	Vector3 headPos; //0x0004
+	Vector3 velocity; //0x0010
+	IntVector3 directionalMove; //0x001C
+	Vector3 readableSpeed; //0x0028
+	Vector3 feetPos; //0x0034
+	Vector3 viewAngle; //0x0040
 	char pad_004C[4]; //0x004C
 	float characterSpeed; //0x0050
 	char pad_0054[4]; //0x0054
@@ -55,22 +55,22 @@ struct Player
 	char pad_0330[8]; //0x0330
 	enum Status status; //0x0338
 	char pad_033C[12]; //0x033C
-	struct Weapon* knife; //0x0348
-	struct Weapon* pistol; //0x034C
-	struct Weapon* carbine; //0x0350
-	struct Weapon* shotgun; //0x0354
-	struct Weapon* subgun; //0x0358
-	struct Weapon* sniper; //0x035C
-	struct Weapon* assaultRifle; //0x0360
-	struct Weapon* cPistol; //0x0364
-	struct Weapon* grenade; //0x0368
-	struct Weapon* akimboPistol; //0x036C
-	struct Weapon* previousWeapon; //0x0370
-	struct Weapon* sCurrentWeapon; //0x0374
-	int32_t weirdWeaponPointer; //0x0378
-	struct Weapon* spawnWeapon; //0x037C
-	struct Weapon* nextSpawnWeapon; //0x0380
-	struct Weapon* lastShotWeapon; //0x0384
+	int32_t knifePointer; //0x0348
+	int32_t pistolPointer; //0x034C
+	int32_t carbinePointer; //0x0350
+	int32_t shotgunPointer; //0x0354
+	int32_t subgunPointer; //0x0358
+	int32_t sniperPointer; //0x035C
+	int32_t assaultRiflePointer; //0x0360
+	int32_t cPistolPointer; //0x0364
+	int32_t grenadePointer; //0x0368
+	int32_t akimboPistolPointer; //0x036C
+	int32_t previousWeaponPointer; //0x0370
+	int32_t currentWeaponPointer; //0x0374
+	int32_t ignoreThisPointer; //0x0378
+	int32_t spawnWeaponPointer; //0x037C
+	int32_t nextSpawnWeaponPointer; //0x0380
+	int32_t lastShotWeaponPointer; //0x0384
 	uintptr_t baseAddress;
 
 	void setHealth(HANDLE hProcess, int32_t health);
@@ -81,7 +81,6 @@ struct Player
 
 	void toggleFlyHack(HANDLE hProcess, bool flyHack);
 	void toggleGhostmode(HANDLE hProcess, bool ghostMode);
-
 };
 
 

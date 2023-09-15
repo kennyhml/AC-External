@@ -16,7 +16,7 @@ Weapon LoadWeapon(HANDLE hProcess, uintptr_t weaponAddress)
 	// owner, the weapon data and the reserve (magazine) data.
 	Weapon weapon(weaponAddress);
 
-	int size = sizeof(ReserveData) - sizeof(uintptr_t);
+	int size = sizeof(Weapon) - sizeof(uintptr_t);
 	ReadProcessMemory(hProcess, (BYTE*)weaponAddress, &weapon, size, nullptr);
 
 	return weapon;
@@ -62,7 +62,7 @@ ReserveData Weapon::getReserveData(HANDLE hProcess)
  */
 void Weapon::setReloadTime(HANDLE hProcess, int16_t reloadTime)
 {
-	uintptr_t targetAddress = FindDMAAddy(hProcess, dataPointer, { 0x108 });
+	uintptr_t targetAddress = dataPointer + 0x108;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&reloadTime, sizeof(reloadTime), hProcess);
 };
 
@@ -74,7 +74,7 @@ void Weapon::setReloadTime(HANDLE hProcess, int16_t reloadTime)
  */
 void Weapon::setFireCooldown(HANDLE hProcess, int16_t cooldown)
 {
-	uintptr_t targetAddress = FindDMAAddy(hProcess, dataPointer, { 0x10A });
+	uintptr_t targetAddress = dataPointer + 0x10A;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&cooldown, sizeof(cooldown), hProcess);
 }
 
@@ -86,7 +86,7 @@ void Weapon::setFireCooldown(HANDLE hProcess, int16_t cooldown)
  */
 void Weapon::setDamage(HANDLE hProcess, int16_t damage)
 {
-	uintptr_t targetAddress = FindDMAAddy(hProcess, dataPointer, { 0x10C });
+	uintptr_t targetAddress = dataPointer + 0x10C;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&damage, sizeof(damage), hProcess);
 }
 
@@ -98,7 +98,7 @@ void Weapon::setDamage(HANDLE hProcess, int16_t damage)
  */
 void Weapon::setMagSize(HANDLE hProcess, int16_t magSize)
 {
-	uintptr_t targetAddress = FindDMAAddy(hProcess, dataPointer, { 0x118 });
+	uintptr_t targetAddress = dataPointer + 0x118;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&magSize, sizeof(magSize), hProcess);
 }
 
@@ -110,7 +110,7 @@ void Weapon::setMagSize(HANDLE hProcess, int16_t magSize)
  */
 void Weapon::setEnemyKnockback(HANDLE hProcess, int16_t knockback)
 {
-	uintptr_t targetAddress = FindDMAAddy(hProcess, dataPointer, { 0x0126 });
+	uintptr_t targetAddress = dataPointer + 0x0126;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&knockback, sizeof(knockback), hProcess);
 }
 
@@ -122,7 +122,7 @@ void Weapon::setEnemyKnockback(HANDLE hProcess, int16_t knockback)
  */
 void Weapon::toggleBulletSpread(HANDLE hProcess, bool bulletSpread)
 {
-	uintptr_t targetAddress = FindDMAAddy(hProcess, dataPointer, { 0x114 });
+	uintptr_t targetAddress = dataPointer + 0x114;
 	int16_t value = bulletSpread ? 18 : 0;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&value, sizeof(value), hProcess);
 }
@@ -135,8 +135,8 @@ void Weapon::toggleBulletSpread(HANDLE hProcess, bool bulletSpread)
  */
 void Weapon::toggleRecoil(HANDLE hProcess, bool recoil)
 {
-	uintptr_t recoilBackAddr = FindDMAAddy(hProcess, dataPointer, { 0x116 });
-	uintptr_t recoilUpAddr = FindDMAAddy(hProcess, dataPointer, { 0x122 });
+	uintptr_t recoilBackAddr = dataPointer + 0x116;
+	uintptr_t recoilUpAddr = dataPointer + 0x122;
 
 	int16_t value = recoil ? 50 : 0;
 	PatchEx((BYTE*)recoilBackAddr, (BYTE*)&value, sizeof(value), hProcess);
@@ -151,8 +151,8 @@ void Weapon::toggleRecoil(HANDLE hProcess, bool recoil)
  */
 void Weapon::toggleWeaponShake(HANDLE hProcess, bool weaponShake)
 {
-	uintptr_t shakeHorizonalAddr = FindDMAAddy(hProcess, dataPointer, { 0x011A });
-	uintptr_t shakeVerticalAddr = FindDMAAddy(hProcess, dataPointer, { 0x011C });
+	uintptr_t shakeHorizonalAddr = dataPointer + 0x011A;
+	uintptr_t shakeVerticalAddr = dataPointer + 0x011C;
 	
 	int16_t value = weaponShake ? 4 : 0;
 	PatchEx((BYTE*)shakeHorizonalAddr, (BYTE*)&value, sizeof(value), hProcess);
@@ -167,7 +167,7 @@ void Weapon::toggleWeaponShake(HANDLE hProcess, bool weaponShake)
  */
 void Weapon::toggleAutomatic(HANDLE hProcess, bool automatic)
 {
-	uintptr_t targetAddress = FindDMAAddy(hProcess, dataPointer, { 0x0128 });
+	uintptr_t targetAddress = dataPointer + 0x0128;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&automatic, sizeof(automatic), hProcess);
 }
 
@@ -179,7 +179,7 @@ void Weapon::toggleAutomatic(HANDLE hProcess, bool automatic)
  */
 void Weapon::setReserveAmmo(HANDLE hProcess, int32_t reserveAmmo)
 {
-	uintptr_t targetAddress = FindDMAAddy(hProcess, reserveDataPointer, { 0x0 });
+	uintptr_t targetAddress = reserveDataPointer + 0x0;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&reserveAmmo, sizeof(reserveAmmo), hProcess);
 }
 
@@ -191,7 +191,7 @@ void Weapon::setReserveAmmo(HANDLE hProcess, int32_t reserveAmmo)
  */
 void Weapon::setAmmo(HANDLE hProcess, int32_t ammo)
 {
-	uintptr_t targetAddress = FindDMAAddy(hProcess, reserveDataPointer, { 0x28 });
+	uintptr_t targetAddress = reserveDataPointer + 0x28;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&ammo, sizeof(ammo), hProcess);
 
 }
