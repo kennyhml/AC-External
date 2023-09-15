@@ -15,11 +15,10 @@ struct ReserveData
 	int32_t cooldown; //0x0050
 	char pad_0054[36]; //0x0054
 	int32_t totalShotsFired; //0x0078
+	uintptr_t baseAddress;
 
 	void setReserveAmmo(HANDLE hProcess, int32_t reserveAmmo);
 	void setAmmo(HANDLE hProcess, int32_t ammo);
 
-private:
-	uintptr_t baseAddress;
 
 };

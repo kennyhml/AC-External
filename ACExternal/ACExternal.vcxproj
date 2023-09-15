@@ -163,6 +163,7 @@
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\gui.cpp" />
+    <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\settings.h" />
     <ClCompile Include="src\weapon\reserveData.cpp" />
     <ClCompile Include="src\geometry.cpp" />

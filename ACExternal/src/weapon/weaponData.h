@@ -23,6 +23,7 @@ struct WeaponData
 	char pad_0124[2]; //0x0124
 	int16_t enemyKnockback; //0x0126
 	bool isAutomatic; //0x0128
+	uintptr_t baseAddress;
 
 	void setReloadTime(HANDLE hProcess, int16_t reloadTime);
 	void setFireCooldown(HANDLE hProcess, int16_t cooldown);
@@ -35,8 +36,6 @@ struct WeaponData
 	void toggleWeaponShake(HANDLE hProcess, bool weaponShake);
 	void toggleAutomatic(HANDLE hProcess, bool automatic);
 
-private:
-	uintptr_t baseAddress;
 
 
 };

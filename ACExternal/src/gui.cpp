@@ -226,7 +226,7 @@ void gui::Render() noexcept
 	ImGui::SetNextWindowPos({ 0, 0 });
 	ImGui::SetNextWindowSize({ WIDTH, HEIGHT });
 	ImGui::Begin(
-		"Header",
+		"AC-External: For crosseyed gamers.",
 		&exit,
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoSavedSettings |
@@ -234,8 +234,57 @@ void gui::Render() noexcept
 		ImGuiWindowFlags_NoMove
 	);
 
-	ImGui::Button("CLick moi");
-	ImGui::Checkbox("Speed hack", &settings::speedHack);
-	ImGui::End();
+	// Create a table with 4 columns
+	if (ImGui::BeginTable("CheckboxTable", 4, ImGuiTableFlags_NoBordersInBody))
+	{
+		// Checkbox labels and values
+		const char* checkboxLabels[] = {
+			"Fly Hack", "Ghost Mode", "God Mode", "No Gravity",
+			"No Recoil", "No Spray", "No Reload", "Rapid Fire", 
+			"Inf. Ammo", "No Shake", "Full Auto", "One Tap"
+		};
+		bool* checkboxValues[] = {
+			&settings::flyHack, &settings::ghostMode, &settings::godMode, &settings::antiGravity,
+			&settings::noRecoil, &settings::noSpray, &settings::instantReload, &settings::rapidFire, 
+			&settings::infiniteAmmo, &settings::noShake, &settings::fullAuto, &settings::oneTap
+		};
 
+		for (int i = 0; i < 12; i++)
+		{
+			if (i % 4 == 0)
+			{
+				// Start a new row for every 4 checkboxes
+				ImGui::TableNextRow();
+			}
+
+			// Create the checkbox
+			ImGui::TableSetColumnIndex(i % 4); // Set the column index modulo 4
+			ImGui::Checkbox(checkboxLabels[i], checkboxValues[i]);
+		}
+
+		ImGui::EndTable();
+	}
+
+	ImGui::NewLine();
+	// Slider
+	ImGui::SetNextItemWidth(90.0f);
+	ImGui::SliderInt("Speed", &settings::speed, 1, 10);
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(90.0f);
+	ImGui::SliderInt("Knockback", &settings::knockback, -100, 100);
+
+
+	static int selectedItem = 0;
+	const char* items[] = { "Assault Rifle", "Sniper Rifle", "Shotgun", "Grenade", "Carbine", "Akimbo"};
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(120.0f);
+	if (ImGui::Combo("Weapon", &selectedItem, items, IM_ARRAYSIZE(items))) 
+	{
+		settings::selectedWeapon = items[selectedItem];
+	}
+	else
+	{
+		settings::selectedWeapon = NULL;
+	}
+	ImGui::End();
 }

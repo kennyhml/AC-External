@@ -7,7 +7,6 @@
 
 enum class MovementFlags : int32_t
 {
-	None = 0,
 	Forward = 1,
 	Back = 255,
 	Left = 256,
@@ -54,7 +53,7 @@ struct Player
 	char pad_0072[6]; //0x0072
 	float zPreJump; //0x0078
 	char pad_007C[4]; //0x007C
-	enum MovementFlags movementFlags; //0x0080
+	enum MovementFlags movementFlag; //0x0080
 	char pad_0084[116]; //0x0084
 	int32_t health; //0x00F8
 	int32_t armor; //0x00FC
@@ -96,21 +95,21 @@ struct Player
 	struct Weapon* spawnWeapon; //0x037C
 	struct Weapon* nextSpawnWeapon; //0x0380
 	struct Weapon* lastShotWeapon; //0x0384
+	uintptr_t baseAddress;
 
 	void setHealth(HANDLE hProcess, int32_t health);
 	void setArmor(HANDLE hProcess, int32_t armor);
 	void setTeam(HANDLE hProcess, Team team);
 	void setName(HANDLE hProcess, char name[16]);
+	void setCurrentWeapon(HANDLE hProcess, const char* weapon);
 
 	void toggleFlyHack(HANDLE hProcess, bool flyHack);
 	void toggleGhostmode(HANDLE hProcess, bool ghostMode);
 
-private:
-	uintptr_t baseAddress;
 };
 
 
 Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddress);
 std::vector<Player> LoadPlayers(HANDLE hProcess, int playerCount, uintptr_t entityListAddr);
 void ToggleAntiGravtiy(HANDLE hProcess, uintptr_t modBaseAddress, bool antiGravity);
-void ToggleSpeedHack(HANDLE hProcess, uintptr_t modBaseAddress, bool speedHack);
+void ToggleSpeedHack(HANDLE hProcess, uintptr_t modBaseAddress, uint8_t speed);

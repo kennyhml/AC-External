@@ -16,6 +16,8 @@ namespace offsets
 	int speedS = 0x5BE41; // negative forwards
 	int speedD = 0x5BF61; // negative sidewards
 
+	int sCurrentWeapon = 0x0374;
+	int fCurrentWeapon = 0x0378;
 }
 
 /**
@@ -134,6 +136,38 @@ void Player::setName(HANDLE hProcess, char name[16])
 	PatchEx((BYTE*)targetAddress, (BYTE*)name, strlen(name), hProcess);
 }
 
+void Player::setCurrentWeapon(HANDLE hProcess, const char* weapon)
+{
+	if (weapon == NULL) { return; }
+	Weapon* wp;
+
+	if (strcmp(weapon, "Assault Rifle") == 0) { wp = assaultRifle; }
+	else if (strcmp(weapon, "Sniper Rifle") == 0) { wp = sniper; }
+	else if (strcmp(weapon, "Shotgun") == 0) { wp = shotgun; }
+	else if (strcmp(weapon, "Grenade") == 0) { wp = grenade; }
+	else if (strcmp(weapon, "Carbine") == 0) { wp = carbine; }
+	else if (strcmp(weapon, "Akimbo") == 0) { wp = akimboPistol; }
+	else {
+		throw std::runtime_error("Unknown weapon!");
+	}
+
+	if (wp == sCurrentWeapon) { return; }
+
+	previousWeapon = sCurrentWeapon;
+	sCurrentWeapon = fCurrentWeapon = wp;
+	uintptr_t targetAddress = baseAddress + offsets::sCurrentWeapon;
+	PatchEx((BYTE*)targetAddress, (BYTE*)&wp->baseAddress, sizeof(uintptr_t), hProcess);
+	std::cout << "[+] Gun has been switched to " << weapon << "!\n";
+
+}
+
+
+
+
+
+
+
+
 /**
  * @brief Enable/disable this player to fly.
  *
@@ -142,6 +176,8 @@ void Player::setName(HANDLE hProcess, char name[16])
  */
 void Player::toggleFlyHack(HANDLE hProcess, bool flyHack)
 {
+	if (flyHack != (status == Status::Spectate)) { return; }
+
 	uintptr_t targetAddress = baseAddress + offsets::status;
 	int value = flyHack ? (int)Status::Spectate : (int)Status::Alive;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&value, sizeof(value), hProcess);
@@ -155,9 +191,15 @@ void Player::toggleFlyHack(HANDLE hProcess, bool flyHack)
  */
 void Player::toggleGhostmode(HANDLE hProcess, bool ghostMode)
 {
+
+	if ((int)movementFlag & (int)MovementFlags::NoClip && ghostMode) return;
+	if (!((int)movementFlag & (int)MovementFlags::NoClip) && !ghostMode) return;
+
 	uintptr_t targetAddress = baseAddress + offsets::moveFlag;
-	int value = ghostMode ? (int)MovementFlags::NoClip : (int)MovementFlags::None;
+	int value = ghostMode ? (int)movementFlag + (int)MovementFlags::NoClip : 0;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&value, sizeof(value), hProcess);
+
+	std::cout << (ghostMode ? "[+] Ghost mode activated!\n" : "[+] Ghost mode deactivated!\n");
 }
 
 /**
@@ -167,9 +209,9 @@ void Player::toggleGhostmode(HANDLE hProcess, bool ghostMode)
  * @param modBaseAddress The base address of the module.
  * @param speedHack Whether speed hack should be on or not.
  */
-void ToggleSpeedHack(HANDLE hProcess, uintptr_t modBaseAddress, bool speedHack)
+void ToggleSpeedHack(HANDLE hProcess, uintptr_t modBaseAddress, uint8_t speed)
 {
-	int32_t speed = speedHack ? 3 : 1;
+
 	PatchEx((BYTE*)modBaseAddress + offsets::speedW, (BYTE*)&speed, 4, hProcess);
 	PatchEx((BYTE*)modBaseAddress + offsets::speedA, (BYTE*)&speed, 4, hProcess);
 

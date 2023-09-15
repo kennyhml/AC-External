@@ -1,6 +1,7 @@
 
 #include "weapon.h"
 #include "../mem.h"
+#include <unordered_map>
 
 // get size of uintptr_t so we can keep it as a buffer for the baseAddress in the objects
 const int s_uintptr = sizeof(uintptr_t);
@@ -43,11 +44,3 @@ Weapon LoadWeapon(HANDLE hProcess, uintptr_t weaponAddress)
 
 	return weapon;
 }
-
-
-
-
-
-
-
-

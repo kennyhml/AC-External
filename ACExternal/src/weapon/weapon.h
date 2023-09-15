@@ -22,8 +22,6 @@ struct Weapon
 	struct Player* owner; //0x0008
 	struct WeaponData* data; //0x000C
 	struct ReserveData* reserveData; //0x0010
-
-private:
 	uintptr_t baseAddress;
 };
 
