@@ -4,6 +4,7 @@
 #include <string>
 #include "stdafx.h"
 #include <vector>
+#include "weapon/weapon.h"
 
 enum class MovementFlags : int32_t
 {
@@ -35,12 +36,29 @@ struct Player
 	Player(uintptr_t baseAddress)
 		:baseAddress(baseAddress) {};
 
-	uint32_t* vTable; //0x0000
+	~Player()
+	{
+		delete pistol; //0x034C
+		pistol = nullptr;
+		delete carbine; //0x0350
+		carbine = nullptr;
+		delete shotgun; //0x0354
+		delete subgun; //0x0358
+		delete sniper; //0x035C
+		delete assaultRifle; //0x0360
+		delete cPistol; //0x0364
+		delete grenade; //0x0368
+		delete akimboPistol; //0x036C
+
+		std::cout << "Player deleted!\n";
+	}
+
+	uint32_t vTable; //0x0000
 	struct Vector3 headPos; //0x0004
 	struct Vector3 velocity; //0x0010
 	struct IntVector3 directionalMove; //0x001C
 	struct Vector3 readableSpeed; //0x0028
-	struct Vector3 feedPos; //0x0034
+	struct Vector3 feetPos; //0x0034
 	struct Vector3 viewAngle; //0x0040
 	char pad_004C[4]; //0x004C
 	float characterSpeed; //0x0050
@@ -91,7 +109,7 @@ struct Player
 	struct Weapon* akimboPistol; //0x036C
 	struct Weapon* previousWeapon; //0x0370
 	struct Weapon* sCurrentWeapon; //0x0374
-	struct Weapon* fCurrentWeapon; //0x0378
+	int32_t weirdWeaponPointer; //0x0378
 	struct Weapon* spawnWeapon; //0x037C
 	struct Weapon* nextSpawnWeapon; //0x0380
 	struct Weapon* lastShotWeapon; //0x0384

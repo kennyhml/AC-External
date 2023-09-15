@@ -33,7 +33,7 @@ Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddress)
 
 	// Collect the pointers to all our weapon pointers in this player, so that we can later
 	// change the value to point to a proper loaded weapon object on the heap
-	std::array<Weapon**, 16> playerWeapons = {
+	std::array<Weapon**, 15> playerWeapons = {
 		&player.knife,
 		&player.pistol,
 		&player.carbine,
@@ -46,7 +46,6 @@ Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddress)
 		&player.akimboPistol,
 		&player.previousWeapon,
 		&player.sCurrentWeapon,
-		&player.fCurrentWeapon,
 		&player.spawnWeapon,
 		&player.nextSpawnWeapon,
 		&player.lastShotWeapon
@@ -62,7 +61,6 @@ Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddress)
 	for (Weapon** weaponPtr : playerWeapons) {
 		*weaponPtr = new Weapon(LoadWeapon(hProcess, (uintptr_t)*weaponPtr));
 	}
-
 	return player;
 };
 
@@ -141,29 +139,25 @@ void Player::setCurrentWeapon(HANDLE hProcess, const char* weapon)
 	if (weapon == NULL) { return; }
 	Weapon* wp;
 
-	if (strcmp(weapon, "Assault Rifle") == 0) { wp = assaultRifle; }
-	else if (strcmp(weapon, "Sniper Rifle") == 0) { wp = sniper; }
-	else if (strcmp(weapon, "Shotgun") == 0) { wp = shotgun; }
-	else if (strcmp(weapon, "Grenade") == 0) { wp = grenade; }
-	else if (strcmp(weapon, "Carbine") == 0) { wp = carbine; }
-	else if (strcmp(weapon, "Akimbo") == 0) { wp = akimboPistol; }
+	if (!strcmp(weapon, "Assault Rifle")) { wp = assaultRifle; }
+	else if (!strcmp(weapon, "Sniper Rifle")) { wp = sniper; }
+	else if (!strcmp(weapon, "Shotgun")) { wp = shotgun; }
+	else if (!strcmp(weapon, "Grenade")) { wp = grenade; }
+	else if (!strcmp(weapon, "Carbine")) { wp = carbine; }
+	else if (!strcmp(weapon, "Akimbo")) { wp = akimboPistol; }
 	else {
 		throw std::runtime_error("Unknown weapon!");
 	}
 
-	if (wp == sCurrentWeapon) { return; }
+	if (wp->ID == sCurrentWeapon->ID) { return; }
 
 	previousWeapon = sCurrentWeapon;
-	sCurrentWeapon = fCurrentWeapon = wp;
+	sCurrentWeapon = wp;
 	uintptr_t targetAddress = baseAddress + offsets::sCurrentWeapon;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&wp->baseAddress, sizeof(uintptr_t), hProcess);
 	std::cout << "[+] Gun has been switched to " << weapon << "!\n";
 
 }
-
-
-
-
 
 
 

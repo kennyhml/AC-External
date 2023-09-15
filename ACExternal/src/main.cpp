@@ -1,7 +1,7 @@
 
 #include "stdafx.h"
 #include <iostream> 
-#include <vector>
+#include <array>
 #include <Windows.h>
 #include <cstdio>
 
@@ -10,6 +10,12 @@
 #include "proc.h"
 #include "player.h"
 #include "weapon/weapon.h"
+
+#include "geometry.h"
+#include <cmath>
+#include <unordered_map>
+
+static bool redirectedWeaponPointers = false;
 
 HANDLE GetProcessHandle(DWORD& pid, uintptr_t& modBaseAddress)
 {
@@ -28,6 +34,59 @@ HANDLE GetProcessHandle(DWORD& pid, uintptr_t& modBaseAddress)
 	return OpenProcess(PROCESS_ALL_ACCESS, NULL, pid);
 }
 
+
+static std::vector<Weapon*> GetWeapons(Player player)
+{
+	return std::vector<Weapon*> {
+		player.knife, player.pistol,
+			player.carbine, player.shotgun,
+			player.subgun, player.sniper,
+			player.assaultRifle, player.grenade,
+			player.akimboPistol
+	};
+}
+
+void RedirectWeaponPointers(Player& localPlayer, std::vector<Player>& otherPlayers)
+{
+	auto badWeapons = GetWeapons(localPlayer);
+	std::unordered_map<char*, uintptr_t> goodAddresses;
+
+	std::cout << "[+] Bad weapon addresses pointed to by local player:\n";
+	for (Weapon* weapon : badWeapons)
+	{
+		std::cout << "\t[+] Bad weapon pointer ->" << std::hex << weapon->baseAddress << "\n";
+	}
+
+	for (Player& p : otherPlayers) 
+	{
+		std::cout << "[+] Checking weapon pointers of " << p.name << "\n";
+		auto weapons = GetWeapons(p);
+		for (Weapon* weapon : weapons)
+		{
+			bool isBad = false;
+			for (Weapon* w : badWeapons) 
+			{
+				if (w->baseAddress == weapon->baseAddress) 
+				{
+					isBad = true;
+					break;
+				}
+			}
+			
+			if (!isBad) {
+				std::cout << "\t[+] Pointer to " << weapon->data->name << " at " << std::hex << weapon->baseAddress << " is good!\n";
+			}
+			else 
+			{
+				std::cout << "\t[+] Pointer to " << weapon->data->name << " at " << std::hex << weapon->baseAddress << " is bad!\n";
+			}
+		}
+
+	}
+}
+
+
+
 int WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 {
 	uintptr_t entityListAddr = FindDMAAddy(hProcess, modBaseAddress + 0x10F4F8, { 0x0 });
@@ -35,6 +94,11 @@ int WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 	intptr_t playerCountAddr = modBaseAddress + 0x10F500;
 
 	Player localPlayer = LoadPlayer(hProcess, localPlayerAddr);
+
+	int playerCount;
+	ReadProcessMemory(hProcess, (BYTE*)playerCountAddr, (BYTE*)&playerCount, sizeof(playerCount), nullptr);
+
+	auto players = LoadPlayers(hProcess, playerCount, entityListAddr);
 
 	if (settings::godMode)
 	{
@@ -66,22 +130,9 @@ int WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 	localPlayer.toggleFlyHack(hProcess, settings::flyHack);
 
 	localPlayer.setCurrentWeapon(hProcess, settings::selectedWeapon);
-
-	return 0;
-
-	int playerCount;
-	ReadProcessMemory(hProcess, (BYTE*)playerCountAddr, (BYTE*)&playerCount, sizeof(playerCount), nullptr);
-
-	std::cout << "Player count: " << playerCount << "\n";
-	auto players = LoadPlayers(hProcess, playerCount, entityListAddr);
-
-	for (Player p : players)
-	{
-		std::cout << p.name << "\n";
-
-	}
-
+	return 1;
 }
+
 bool SetupConsole()
 {
 	if (!AllocConsole()) {

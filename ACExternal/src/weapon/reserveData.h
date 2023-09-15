@@ -8,6 +8,10 @@ struct ReserveData
 	ReserveData(uintptr_t baseAddress)
 		: baseAddress(baseAddress) {};
 
+	~ReserveData() {
+		std::cout << "Reserve data deleted!\n";
+	};
+
 	int32_t reserveAmmo; //0x0000
 	char pad_0004[36]; //0x0004
 	int32_t ammo; //0x0028

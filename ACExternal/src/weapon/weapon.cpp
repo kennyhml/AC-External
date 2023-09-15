@@ -27,12 +27,6 @@ Weapon LoadWeapon(HANDLE hProcess, uintptr_t weaponAddress)
 	Weapon weapon(weaponAddress);
 	ReadProcessMemory(hProcess, (BYTE*)weaponAddress, &weapon, sizeof(Weapon) - s_uintptr, nullptr);
 
-	// The weapon.owner currently only contains the address of the owner, now we load it
-	// and change the .owner pointer to the loaded object
-	Player* owner = new Player((uintptr_t)weapon.owner);
-	ReadProcessMemory(hProcess, (BYTE*)weapon.owner, &*owner, sizeof(Player) - s_uintptr, nullptr);
-	weapon.owner = owner;
-
 	// Do the same we did for the owner for weaponData and reserveData
 	WeaponData* weaponData = new WeaponData((uintptr_t)weapon.data);
 	ReadProcessMemory(hProcess, (BYTE*)weapon.data, &*weaponData, sizeof(WeaponData) - s_uintptr, nullptr);

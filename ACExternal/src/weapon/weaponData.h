@@ -7,6 +7,10 @@ struct WeaponData
 	WeaponData(uintptr_t baseAddress)
 		: baseAddress(baseAddress) {};
 
+	~WeaponData() {
+		std::cout << "Weapon data deleted!\n";
+	};
+
 	char name[7]; //0x0000
 	char pad_0007[257]; //0x0007
 	int16_t reloadTime; //0x0108
