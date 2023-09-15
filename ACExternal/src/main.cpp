@@ -3,7 +3,10 @@
 #include <iostream> 
 #include <vector>
 #include <Windows.h>
+#include <thread>
 
+#include "settings.h"
+#include "gui.h"
 #include "proc.h"
 #include "player.h"
 #include "weapon/weapon.h"
@@ -17,12 +20,42 @@ namespace staticOffsets {
 	int dmgInstruction = 0x29D1F;
 }
 
+int main();
+
+int __stdcall wWinMain(
+	HINSTANCE instance,
+	HINSTANCE previousInstance,
+	PWSTR arguments,
+	int commandShow)
+{
+
+	gui::CreateHWindow("Cheat Menu", "Cheat Menu Class");
+	gui::CreateDevice();
+	gui::CreateImGui();
+
+	while (gui::exit)
+	{
+		gui::BeginRender();
+		gui::Render();
+		gui::EndRender();
+
+		main();
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+	gui::DestroyImGui();
+	gui::DestroyDevice();
+	gui::DestroyHWindow();
+
+	return EXIT_SUCCESS;
+};
+
 int main()
 {
-	DWORD pid = GetProcessID(L"ac_client.exe");
+	DWORD pid = GetProcessID("ac_client.exe");
 	std::cout << "[+] Client PID: " << pid << "\n";
 
-	uintptr_t moduleBaseAddr = GetModuleBaseAddress(pid, L"ac_client.exe");
+	uintptr_t moduleBaseAddr = GetModuleBaseAddress(pid, "ac_client.exe");
 	std::cout << "[+] Module base address: 0x" << std::hex << moduleBaseAddr << "\n";
 
 	HANDLE hProcess = 0;
@@ -32,6 +65,13 @@ int main()
 	uintptr_t localPlayerAddr = FindDMAAddy(hProcess, moduleBaseAddr + staticOffsets::localPlayer, { 0x0 });
 	intptr_t playerCountAddr = moduleBaseAddr + staticOffsets::playerCount;
 	Player localPlayer = LoadPlayer(hProcess, localPlayerAddr);
+
+
+	ToggleSpeedHack(hProcess, moduleBaseAddr, settings::speedHack);
+	return 0;
+
+
+
 
 	int playerCount;
 	ReadProcessMemory(hProcess, (BYTE*)playerCountAddr, (BYTE*)&playerCount, sizeof(playerCount), nullptr);

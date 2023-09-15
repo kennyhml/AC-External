@@ -12,7 +12,7 @@
  *
  * @return The PROCESSENTRY32 struct of the process if found.
  */
-static std::optional<PROCESSENTRY32> FindProcessInSnapshot(HANDLE hSnap, const wchar_t* name)
+static std::optional<PROCESSENTRY32> FindProcessInSnapshot(HANDLE hSnap, const char* name)
 {
 	// PROCESSENTRY32: an entry of the processes in the address space of the snapshot.
 	// Essentially a buffer to later push each process into, which is why we need to set
@@ -30,7 +30,7 @@ static std::optional<PROCESSENTRY32> FindProcessInSnapshot(HANDLE hSnap, const w
 	// And check whether we found the target process.
 	do
 	{
-		if (!_wcsicmp(currProcess.szExeFile, name)) return currProcess;
+		if (!_stricmp(currProcess.szExeFile, name)) return currProcess;
 	} while (Process32Next(hSnap, &currProcess));
 
 	return std::nullopt;
@@ -44,7 +44,7 @@ static std::optional<PROCESSENTRY32> FindProcessInSnapshot(HANDLE hSnap, const w
  *
  * @return The MODULEENTRY32 struct of the module if found.
  */
-static std::optional<MODULEENTRY32> FindModuleInSnapshot(HANDLE hSnap, const wchar_t* name)
+static std::optional<MODULEENTRY32> FindModuleInSnapshot(HANDLE hSnap, const char* name)
 {
 	// MODULEENTRY32: an entry of the modules in the address space of the snapshot.
 	// Essentially a buffer to later push each module into, which is why we need to set
@@ -61,7 +61,7 @@ static std::optional<MODULEENTRY32> FindModuleInSnapshot(HANDLE hSnap, const wch
 	// And check whether we found the target module.
 	do
 	{
-		if (!_wcsicmp(currModule.szModule, name)) return currModule;
+		if (!_stricmp(currModule.szModule, name)) return currModule;
 	} while (Module32Next(hSnap, &currModule));
 
 	return std::nullopt;
@@ -75,7 +75,7 @@ static std::optional<MODULEENTRY32> FindModuleInSnapshot(HANDLE hSnap, const wch
  *
  * @return The PID (Process ID) if the process exists, else 0.
  */
-DWORD GetProcessID(const wchar_t* name)
+DWORD GetProcessID(const char* name)
 {
 	// TH32CS_SNAPPROCESS: Include all processes in the system.
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -101,7 +101,7 @@ DWORD GetProcessID(const wchar_t* name)
  *
  * @return The base address if the module exists, else 0.
  */
-uintptr_t GetModuleBaseAddress(DWORD pid, const wchar_t* name)
+uintptr_t GetModuleBaseAddress(DWORD pid, const char* name)
 {
 	// TH32CS_SNAPMODULE alone will exclude 32-bit modules on a 64-bit process
 	DWORD dwFlags = TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32;
