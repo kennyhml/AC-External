@@ -7,10 +7,6 @@ struct WeaponData
 	WeaponData(uintptr_t baseAddress)
 		: baseAddress(baseAddress) {};
 
-	~WeaponData() {
-		std::cout << "Weapon data deleted!\n";
-	};
-
 	char name[7]; //0x0000
 	char pad_0007[257]; //0x0007
 	int16_t reloadTime; //0x0108
@@ -28,18 +24,5 @@ struct WeaponData
 	int16_t enemyKnockback; //0x0126
 	bool isAutomatic; //0x0128
 	uintptr_t baseAddress;
-
-	void setReloadTime(HANDLE hProcess, int16_t reloadTime);
-	void setFireCooldown(HANDLE hProcess, int16_t cooldown);
-	void setDamage(HANDLE hProcess, int16_t damage);
-	void setMagSize(HANDLE hProcess, int16_t magSize);
-	void setEnemyKnockback(HANDLE hProcess, int16_t knockback);
-
-	void toggleBulletSpread(HANDLE hProcess, bool bulletSpread);
-	void toggleRecoil(HANDLE hProcess, bool recoil);
-	void toggleWeaponShake(HANDLE hProcess, bool weaponShake);
-	void toggleAutomatic(HANDLE hProcess, bool automatic);
-
-
 
 };

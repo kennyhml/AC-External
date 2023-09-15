@@ -2,56 +2,14 @@
 
 #include "geometry.h"
 #include <string>
-#include "stdafx.h"
-#include <vector>
-#include "weapon/weapon.h"
-
-enum class MovementFlags : int32_t
-{
-	Forward = 1,
-	Back = 255,
-	Left = 256,
-	Right = 65280,
-	Respawn = 65536,
-	NoClip = 262144,
-	Ghost = 327680
-};
-
-enum class Team : int32_t
-{
-	CLA = 0,
-	RVSF = 1,
-	Spectate = 5
-};
-
-enum class Status : int32_t
-{
-	Alive = 0,
-	Dead = 1,
-	Spectate = 5
-};
+#include "../stdafx.h"
+#include "../weapon/weapon.h"
+#include "enums.h"
 
 struct Player
 {
 	Player(uintptr_t baseAddress)
 		:baseAddress(baseAddress) {};
-
-	~Player()
-	{
-		delete pistol; //0x034C
-		pistol = nullptr;
-		delete carbine; //0x0350
-		carbine = nullptr;
-		delete shotgun; //0x0354
-		delete subgun; //0x0358
-		delete sniper; //0x035C
-		delete assaultRifle; //0x0360
-		delete cPistol; //0x0364
-		delete grenade; //0x0368
-		delete akimboPistol; //0x036C
-
-		std::cout << "Player deleted!\n";
-	}
 
 	uint32_t vTable; //0x0000
 	struct Vector3 headPos; //0x0004

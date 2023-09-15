@@ -106,11 +106,11 @@ int WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 		localPlayer.setHealth(hProcess, 100);
 	}
 
-	Weapon* currWeapon = localPlayer.sCurrentWeapon;
+	Weapon currWeapon = LoadWeapon();
 
 	if (settings::infiniteAmmo)
 	{
-		currWeapon->reserveData->setAmmo(hProcess, currWeapon->data->magSize);
+		currWeapon.setAmmo(hProcess, currWeapon.getData(hProcess).magSize);
 	}
 
 	currWeapon->data->setFireCooldown(hProcess, settings::rapidFire ? 0 : 160);

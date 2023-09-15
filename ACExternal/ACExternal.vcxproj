@@ -165,14 +165,12 @@
     <ClCompile Include="src\gui.cpp" />
     <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\settings.h" />
-    <ClCompile Include="src\weapon\reserveData.cpp" />
-    <ClCompile Include="src\geometry.cpp" />
-    <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\player\geometry.cpp" />
+    <ClCompile Include="src\player\player.cpp" />
     <ClCompile Include="src\mem.cpp" />
     <ClCompile Include="src\proc.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\weapon\weapon.cpp" />
-    <ClCompile Include="src\weapon\weaponData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h" />
@@ -184,9 +182,10 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="src\gui.h" />
+    <ClInclude Include="src\player\enums.h" />
     <ClInclude Include="src\weapon\reserveData.h" />
-    <ClInclude Include="src\geometry.h" />
-    <ClInclude Include="src\player.h" />
+    <ClInclude Include="src\player\geometry.h" />
+    <ClInclude Include="src\player\player.h" />
     <ClInclude Include="src\mem.h" />
     <ClInclude Include="src\proc.h" />
     <ClInclude Include="src\stdafx.h" />
