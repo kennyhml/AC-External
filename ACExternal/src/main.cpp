@@ -1,15 +1,15 @@
 
 #include "stdafx.h"
-#include <Windows.h>
-
 #include "settings.h"
 #include "gui.h"
 #include "proc.h"
 #include "player/player.h"
 #include "weapon/weapon.h"
+#include "mem.h"
 
+#include <Windows.h>
 
-HANDLE GetProcessHandle(DWORD& pid, uintptr_t& modBaseAddress)
+static HANDLE GetProcessHandle(DWORD& pid, uintptr_t& modBaseAddress)
 {
 	while (!pid)
 	{
@@ -27,18 +27,14 @@ HANDLE GetProcessHandle(DWORD& pid, uintptr_t& modBaseAddress)
 }
 
 
-void WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
+static void WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 {
-	uintptr_t entityListAddr = FindDMAAddy(hProcess, modBaseAddress + 0x10F4F8, { 0x0 });
-	uintptr_t localPlayerAddr = FindDMAAddy(hProcess, modBaseAddress + 0x10F4F4, { 0x0 });
-	intptr_t playerCountAddr = modBaseAddress + 0x10F500;
+	uintptr_t entityListAddr = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F8);
+	uintptr_t localPlayerAddr = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F4);
 
 	Player localPlayer = LoadPlayer(hProcess, localPlayerAddr);
 
-
-
 	int playerCount;
-	ReadProcessMemory(hProcess, (BYTE*)playerCountAddr, (BYTE*)&playerCount, sizeof(playerCount), nullptr);
 
 	auto players = LoadPlayers(hProcess, playerCount, entityListAddr);
 
@@ -74,26 +70,6 @@ void WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 	localPlayer.setCurrentWeapon(hProcess, settings::selectedWeapon);
 }
 
-bool SetupConsole()
-{
-	if (!AllocConsole()) {
-		MessageBox(NULL, "Failed to create a console.", "Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-
-	FILE* pFile;
-	if (freopen_s(&pFile, "CONOUT$", "w", stdout) != 0) {
-		MessageBox(NULL, "Failed to redirect stdout to console.", "Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-
-	if (freopen_s(&pFile, "CONOUT$", "w", stderr) != 0) {
-		MessageBox(NULL, "Failed to redirect stderr to console.", "Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-	return true;
-}
-
 int WINAPI WinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -127,3 +103,23 @@ int WINAPI WinMain(
 	FreeConsole();
 	return EXIT_SUCCESS;
 };
+
+static bool SetupConsole()
+{
+	if (!AllocConsole()) {
+		MessageBox(NULL, "Failed to create a console.", "Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
+
+	FILE* pFile;
+	if (freopen_s(&pFile, "CONOUT$", "w", stdout) != 0) {
+		MessageBox(NULL, "Failed to redirect stdout to console.", "Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
+
+	if (freopen_s(&pFile, "CONOUT$", "w", stderr) != 0) {
+		MessageBox(NULL, "Failed to redirect stderr to console.", "Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
+	return true;
+}
