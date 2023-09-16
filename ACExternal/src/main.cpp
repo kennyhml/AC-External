@@ -31,11 +31,10 @@ static void WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 {
 	uintptr_t entityListAddr = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F8);
 	uintptr_t localPlayerAddr = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F4);
+	intptr_t playerCountAddr = GetPointedAddress(hProcess, modBaseAddress + 0x10F500);
+	int playerCount = GetPlayerCount(hProcess, modBaseAddress);
 
 	Player localPlayer = LoadPlayer(hProcess, localPlayerAddr);
-
-	int playerCount;
-
 	auto players = LoadPlayers(hProcess, playerCount, entityListAddr);
 
 	if (settings::godMode)

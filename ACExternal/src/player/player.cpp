@@ -184,3 +184,11 @@ void ToggleAntiGravtiy(HANDLE hProcess, uintptr_t modBaseAddress, bool antiGravi
 		PatchEx((BYTE*)instructionAddress, (BYTE*)"\x01\x4B\x54", 3, hProcess);
 	}
 };
+
+int GetPlayerCount(HANDLE hProcess, uintptr_t modBaseAddress)
+{
+	int count;
+	uintptr_t targetAddress = modBaseAddress + 0x10F500;
+	ReadProcessMemory(hProcess, (BYTE*)targetAddress, &count, sizeof(count), nullptr);
+	return count;
+}

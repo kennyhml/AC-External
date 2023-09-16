@@ -88,3 +88,4 @@ Player LoadPlayer(HANDLE hProcess, uintptr_t playerAddress);
 std::vector<Player> LoadPlayers(HANDLE hProcess, int playerCount, uintptr_t entityListAddr);
 void ToggleAntiGravtiy(HANDLE hProcess, uintptr_t modBaseAddress, bool antiGravity);
 void ToggleSpeedHack(HANDLE hProcess, uintptr_t modBaseAddress, uint8_t speed);
+int GetPlayerCount(HANDLE hProcess, uintptr_t modBaseAddress);
