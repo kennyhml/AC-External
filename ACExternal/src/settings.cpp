@@ -20,5 +20,10 @@ namespace settings
 	bool noShake = false;
 	bool fullAuto = false;
 	bool oneTap = false;
+	bool aimbot = false;
+
+	int aimbotMinDistance = 0;
+	int aimbotMaxDistance = 50;
+
 
 }

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../stdafx.h"
-#include <cmath>
-#include <numbers>
 
 struct Vector3
 {
@@ -39,4 +37,5 @@ struct Collider
 	float width; //0x000C
 };
 
-Vector3 CalculateAngles(Vector3& localPosition, Vector3& enemyPosition);
+Vector3 CalculateAngle(Vector3& localPosition, Vector3& enemyPosition);
+float GetDistance(Vector3 localPosition, Vector3 enemyPosition);

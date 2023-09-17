@@ -133,7 +133,7 @@ void Player::setPosition(HANDLE hProcess, Vector3 position)
  */
 void Player::setView(HANDLE hProcess, Vector3 view)
 {
-	Vector3 newView = { view.x, view.y, view.z };
+	Vector3 newView = { view.x, view.y, 0.f };
 
 	uintptr_t targetAddress = baseAddress + 0x40;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&newView, sizeof(newView), hProcess);
@@ -225,6 +225,17 @@ void ToggleAntiGravtiy(HANDLE hProcess, uintptr_t modBaseAddress, bool antiGravi
 		PatchEx((BYTE*)instructionAddress, (BYTE*)"\x01\x4B\x54", 3, hProcess);
 	}
 };
+
+
+bool Player::isEnemy(Team localPlayerTeam)
+{
+	return team != localPlayerTeam;
+}
+
+bool Player::isValid()
+{
+	return status == Status::Alive && health > 0 && health < 9999;
+}
 
 int GetPlayerCount(HANDLE hProcess, uintptr_t modBaseAddress)
 {

@@ -14,9 +14,10 @@
 static uintptr_t entityListAddress;
 static uintptr_t localPlayerAddress;
 static uintptr_t playerCountAddress;
+static uintptr_t modBaseAddress;
 
 
-static HANDLE GetProcessHandle(DWORD& pid, uintptr_t& modBaseAddress)
+static HANDLE GetProcessHandle(DWORD& pid)
 {
 	while (!pid)
 	{
@@ -32,6 +33,40 @@ static HANDLE GetProcessHandle(DWORD& pid, uintptr_t& modBaseAddress)
 
 	return OpenProcess(PROCESS_ALL_ACCESS, NULL, pid);
 }
+
+static void Aimbot(HANDLE hProcess, Player& localPlayer)
+{
+	int playerCount = GetPlayerCount(hProcess, modBaseAddress);
+	auto players = LoadPlayers(hProcess, playerCount, entityListAddress);
+
+	int closestDistance = 999999999;
+	Player closestEnemy = NULL;
+	bool enemyFound = false;
+
+	for (Player& enemy : players)
+	{
+		// Don't aimbot friendlies or dead players
+		if (!enemy.isEnemy(localPlayer.team) || !enemy.isValid()) { continue; }
+
+		int distance = GetDistance(localPlayer.headPos, enemy.headPos);
+		if (distance > settings::aimbotMaxDistance || distance < settings::aimbotMinDistance) { continue; }
+
+		if (distance < closestDistance)
+		{
+			closestDistance = distance;
+			closestEnemy = enemy;
+			enemyFound = true;
+		}
+	}
+
+	if (!enemyFound) { return; }
+	std::cout << "[+] Closest enemy to aimbot: " << closestEnemy.name << "\n!";
+
+	Vector3 angle = CalculateAngle(localPlayer.headPos, closestEnemy.headPos);
+	localPlayer.setView(hProcess, angle);
+
+}
+
 
 static void InstaKillEveryone(HANDLE hProcess, Player localPlayer, std::vector<Player> players)
 {
@@ -64,19 +99,9 @@ static void InstaKillEveryone(HANDLE hProcess, Player localPlayer, std::vector<P
 	knife.setFireCooldown(hProcess, 120);
 }
 
-static void WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
+static void WriteSettingsToClient(HANDLE hProcess)
 {
-	int playerCount = GetPlayerCount(hProcess, modBaseAddress);
 	Player localPlayer = LoadPlayer(hProcess, localPlayerAddress);
-	auto players = LoadPlayers(hProcess, playerCount, entityListAddress);
-
-	Player target = LoadPlayer(hProcess, players.at(2).baseAddress);
-
-	Vector3 angle = CalculateAngles(localPlayer.headPos, target.headPos);
-
-
-	localPlayer.setView(hProcess, angle);
-	return;
 
 	if (settings::godMode)
 	{
@@ -84,13 +109,11 @@ static void WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 		localPlayer.setHealth(hProcess, 100);
 	}
 
-
 	Weapon currWeapon = LoadWeapon(hProcess, localPlayer.currentWeaponPointer);
 	if (settings::infiniteAmmo)
 	{
 		currWeapon.setAmmo(hProcess, currWeapon.getData(hProcess).magSize);
 	}
-
 
 	currWeapon.setFireCooldown(hProcess, settings::rapidFire ? 0 : 160);
 	currWeapon.setDamage(hProcess, settings::oneTap ? 9999 : 20);
@@ -108,6 +131,10 @@ static void WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 	localPlayer.toggleFlyHack(hProcess, settings::flyHack);
 
 	localPlayer.setCurrentWeapon(hProcess, settings::selectedWeapon);
+
+	if (settings::aimbot) {
+		Aimbot(hProcess, localPlayer);
+	}
 }
 
 static bool SetupConsole()
@@ -143,8 +170,8 @@ int WINAPI WinMain(
 	gui::CreateImGui();
 
 	DWORD pid = 0;
-	uintptr_t modBaseAddress = 0;
-	HANDLE hProcess = GetProcessHandle(pid, modBaseAddress);
+	modBaseAddress = 0;
+	HANDLE hProcess = GetProcessHandle(pid);
 	entityListAddress = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F8);
 	localPlayerAddress = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F4);
 	playerCountAddress = GetPointedAddress(hProcess, modBaseAddress + 0x10F500);
@@ -157,7 +184,7 @@ int WINAPI WinMain(
 		gui::Render();
 		gui::EndRender();
 
-		WriteSettingsToClient(hProcess, modBaseAddress);
+		WriteSettingsToClient(hProcess);
 	}
 
 	gui::DestroyImGui();

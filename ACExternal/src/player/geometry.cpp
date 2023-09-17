@@ -3,6 +3,17 @@
 #define MATH_PI 3.14159265359
 #define HALF_CIRCLE 180
 
+
+
+float GetDistance(Vector3 localPosition, Vector3 enemyPosition)
+{
+	return static_cast<float>((sqrt(
+		((localPosition.x - enemyPosition.x) * (localPosition.x - enemyPosition.x)) +
+		((localPosition.y - enemyPosition.y) * (localPosition.y - enemyPosition.y)) +
+		((localPosition.z - enemyPosition.z) * (localPosition.z - enemyPosition.z))
+	)));
+}
+
 static float GetDistance2D(Vector3& localPosition, Vector3& enemyPosition)
 {
 	return { (float)(sqrt(
@@ -11,11 +22,8 @@ static float GetDistance2D(Vector3& localPosition, Vector3& enemyPosition)
 	)) };
 }
 
-Vector3 CalculateAngles(Vector3& localPosition, Vector3& enemyPosition)
+Vector3 CalculateAngle(Vector3& localPosition, Vector3& enemyPosition)
 {
-
-	Vector3 values;
-
 	float aTriangle = enemyPosition.x - localPosition.x;
 	float bTriangle = enemyPosition.z - localPosition.z;
 	float yTriangle = enemyPosition.y - localPosition.y;
@@ -25,8 +33,5 @@ Vector3 CalculateAngles(Vector3& localPosition, Vector3& enemyPosition)
 	float yaw = -(float)(atan2(aTriangle, bTriangle) * (HALF_CIRCLE / MATH_PI) + HALF_CIRCLE);
 	float pitch = (float)((atan2(yTriangle, triangleHyp)) * (HALF_CIRCLE / MATH_PI));
 
-	values.x = yaw;
-	values.y = pitch;
-	values.z = 0;
-	return values;
+	return Vector3(yaw, pitch, 0);
 }

@@ -20,4 +20,9 @@ namespace settings
 	extern bool noShake;
 	extern bool fullAuto;
 	extern bool oneTap;
+	extern bool aimbot;
+
+	extern int aimbotMinDistance;
+	extern int aimbotMaxDistance;
+
 }

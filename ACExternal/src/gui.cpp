@@ -241,15 +241,17 @@ void gui::Render() noexcept
 		const char* checkboxLabels[] = {
 			"Fly Hack", "Ghost Mode", "God Mode", "No Gravity",
 			"No Recoil", "No Spray", "No Reload", "Rapid Fire", 
-			"Inf. Ammo", "No Shake", "Full Auto", "One Tap"
+			"Inf. Ammo", "No Shake", "Full Auto", "One Tap",
+			"Aimbot"
 		};
 		bool* checkboxValues[] = {
 			&settings::flyHack, &settings::ghostMode, &settings::godMode, &settings::antiGravity,
 			&settings::noRecoil, &settings::noSpray, &settings::instantReload, &settings::rapidFire, 
-			&settings::infiniteAmmo, &settings::noShake, &settings::fullAuto, &settings::oneTap
+			&settings::infiniteAmmo, &settings::noShake, &settings::fullAuto, &settings::oneTap,
+			&settings::aimbot
 		};
 
-		for (int i = 0; i < 12; i++)
+		for (int i = 0; i < 13; i++)
 		{
 			if (i % 4 == 0)
 			{
@@ -273,7 +275,6 @@ void gui::Render() noexcept
 	ImGui::SetNextItemWidth(90.0f);
 	ImGui::SliderInt("Knockback", &settings::knockback, -100, 100);
 
-
 	static int selectedItem = 0;
 	const char* items[] = { "Assault Rifle", "Sniper Rifle", "Shotgun", "Grenade", "Carbine", "Akimbo"};
 	ImGui::SameLine();
@@ -286,5 +287,6 @@ void gui::Render() noexcept
 	{
 		settings::selectedWeapon = NULL;
 	}
+
 	ImGui::End();
 }
