@@ -97,6 +97,8 @@ void Player::setCurrentWeapon(HANDLE hProcess, const char* weapon)
 	else if (!strcmp(weapon, "Grenade")) { weaponPointer = grenadePointer; }
 	else if (!strcmp(weapon, "Carbine")) { weaponPointer = carbinePointer; }
 	else if (!strcmp(weapon, "Akimbo")) { weaponPointer = akimboPistolPointer; }
+	else if (!strcmp(weapon, "Knife")) { weaponPointer = knifePointer; }
+
 	else {
 		throw std::runtime_error("Unknown weapon!");
 	}
@@ -109,6 +111,45 @@ void Player::setCurrentWeapon(HANDLE hProcess, const char* weapon)
 	uintptr_t targetAddress = baseAddress + 0x0374;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&currentWeaponPointer, sizeof(uintptr_t), hProcess);
 	std::cout << "[+] Gun has been switched to " << weapon << "!\n";
+}
+
+/**
+ * @brief Changes the player position to a given vec3.
+ *
+ * @param hProcess A handle to the target process for memory modification.
+ * @param position The new position of the player.
+ */
+void Player::setPosition(HANDLE hProcess, Vector3 position)
+{
+	uintptr_t targetAddress = baseAddress + 0x34;
+	PatchEx((BYTE*)targetAddress, (BYTE*)&position, sizeof(position), hProcess);
+}
+
+/**
+ * @brief Changes the player view angles to a given vec3.
+ *
+ * @param hProcess A handle to the target process for memory modification.
+ * @param view The new view of the player.
+ */
+void Player::setView(HANDLE hProcess, Vector3 view)
+{
+	Vector3 newView = { view.x, view.y, view.z };
+
+	uintptr_t targetAddress = baseAddress + 0x40;
+	PatchEx((BYTE*)targetAddress, (BYTE*)&newView, sizeof(newView), hProcess);
+}
+
+/**
+ * @brief Enable/disable player to be using his weapon.
+ *
+ * @param hProcess A handle to the target process for memory modification.
+ * @param attacking Whether the player should be attacking or not.
+ */
+void Player::toggleAttacking(HANDLE hProcess, bool attacking)
+{
+	uintptr_t targetAddress = baseAddress + 0x224;
+	int value = attacking ? 1 : 0;
+	PatchEx((BYTE*)targetAddress, (BYTE*)&value, sizeof(value), hProcess);
 }
 
 /**

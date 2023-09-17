@@ -9,6 +9,13 @@
 
 #include <Windows.h>
 
+
+
+static uintptr_t entityListAddress;
+static uintptr_t localPlayerAddress;
+static uintptr_t playerCountAddress;
+
+
 static HANDLE GetProcessHandle(DWORD& pid, uintptr_t& modBaseAddress)
 {
 	while (!pid)
@@ -26,16 +33,50 @@ static HANDLE GetProcessHandle(DWORD& pid, uintptr_t& modBaseAddress)
 	return OpenProcess(PROCESS_ALL_ACCESS, NULL, pid);
 }
 
+static void InstaKillEveryone(HANDLE hProcess, Player localPlayer, std::vector<Player> players)
+{
+
+	localPlayer.setHealth(hProcess, 9999);
+	localPlayer.setCurrentWeapon(hProcess, "Knife");
+	// localPlayer.setView(hProcess, Vector3(localPlayer.viewAngle.x, 90, 0));
+	Weapon knife = LoadWeapon(hProcess, localPlayer.currentWeaponPointer);
+
+	knife.setDamage(hProcess, 200);
+	knife.setFireCooldown(hProcess, 0);
+
+	for (Player& targetPlayer : players) {
+		targetPlayer = LoadPlayer(hProcess, targetPlayer.baseAddress);
+
+		if (targetPlayer.team == localPlayer.team || 
+			targetPlayer.status != Status::Alive ) { continue; }
+
+		while (targetPlayer.status == Status::Alive) {
+			localPlayer.setHealth(hProcess, 9999);
+			localPlayer.setPosition(hProcess, targetPlayer.feetPos);
+			localPlayer.toggleAttacking(hProcess, true);
+			targetPlayer = LoadPlayer(hProcess, targetPlayer.baseAddress);
+		}
+		std::cout << "[+] Slaughtered " << targetPlayer.name << "!\n";
+	}
+
+	localPlayer.toggleAttacking(hProcess, false);
+	knife.setDamage(hProcess, 20);
+	knife.setFireCooldown(hProcess, 120);
+}
 
 static void WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 {
-	uintptr_t entityListAddr = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F8);
-	uintptr_t localPlayerAddr = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F4);
-	intptr_t playerCountAddr = GetPointedAddress(hProcess, modBaseAddress + 0x10F500);
 	int playerCount = GetPlayerCount(hProcess, modBaseAddress);
+	Player localPlayer = LoadPlayer(hProcess, localPlayerAddress);
+	auto players = LoadPlayers(hProcess, playerCount, entityListAddress);
 
-	Player localPlayer = LoadPlayer(hProcess, localPlayerAddr);
-	auto players = LoadPlayers(hProcess, playerCount, entityListAddr);
+	Player target = LoadPlayer(hProcess, players.at(2).baseAddress);
+
+	Vector3 angle = CalculateAngles(localPlayer.headPos, target.headPos);
+
+
+	localPlayer.setView(hProcess, angle);
+	return;
 
 	if (settings::godMode)
 	{
@@ -43,16 +84,16 @@ static void WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 		localPlayer.setHealth(hProcess, 100);
 	}
 
-	Weapon currWeapon = LoadWeapon(hProcess, localPlayer.currentWeaponPointer);
 
+	Weapon currWeapon = LoadWeapon(hProcess, localPlayer.currentWeaponPointer);
 	if (settings::infiniteAmmo)
 	{
 		currWeapon.setAmmo(hProcess, currWeapon.getData(hProcess).magSize);
 	}
 
+
 	currWeapon.setFireCooldown(hProcess, settings::rapidFire ? 0 : 160);
 	currWeapon.setDamage(hProcess, settings::oneTap ? 9999 : 20);
-
 	currWeapon.toggleRecoil(hProcess, !settings::noRecoil);
 	currWeapon.toggleBulletSpread(hProcess, !settings::noSpray);
 	currWeapon.toggleAutomatic(hProcess, settings::fullAuto);
@@ -68,40 +109,6 @@ static void WriteSettingsToClient(HANDLE hProcess, uintptr_t modBaseAddress)
 
 	localPlayer.setCurrentWeapon(hProcess, settings::selectedWeapon);
 }
-
-int WINAPI WinMain(
-	_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ PSTR lpCmdLine,
-	_In_ int nCmdShow)
-{
-	if (!SetupConsole()) { return EXIT_FAILURE; };
-
-	gui::CreateHWindow("Cheat Menu", "Cheat Menu Class");
-	gui::CreateDevice();
-	gui::CreateImGui();
-
-	DWORD pid = 0;
-	uintptr_t modBaseAddress = 0;
-	HANDLE hProcess = GetProcessHandle(pid, modBaseAddress);
-
-
-	while (gui::exit)
-	{
-		gui::BeginRender();
-		gui::Render();
-		gui::EndRender();
-
-		WriteSettingsToClient(hProcess, modBaseAddress);
-	}
-
-	gui::DestroyImGui();
-	gui::DestroyDevice();
-	gui::DestroyHWindow();
-
-	FreeConsole();
-	return EXIT_SUCCESS;
-};
 
 static bool SetupConsole()
 {
@@ -122,3 +129,41 @@ static bool SetupConsole()
 	}
 	return true;
 }
+
+int WINAPI WinMain(
+	_In_ HINSTANCE hInstance,
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ PSTR lpCmdLine,
+	_In_ int nCmdShow)
+{
+	if (!SetupConsole()) { return EXIT_FAILURE; };
+
+	gui::CreateHWindow("Cheat Menu", "Cheat Menu Class");
+	gui::CreateDevice();
+	gui::CreateImGui();
+
+	DWORD pid = 0;
+	uintptr_t modBaseAddress = 0;
+	HANDLE hProcess = GetProcessHandle(pid, modBaseAddress);
+	entityListAddress = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F8);
+	localPlayerAddress = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F4);
+	playerCountAddress = GetPointedAddress(hProcess, modBaseAddress + 0x10F500);
+
+	Sleep(3000);
+
+	while (gui::exit)
+	{
+		gui::BeginRender();
+		gui::Render();
+		gui::EndRender();
+
+		WriteSettingsToClient(hProcess, modBaseAddress);
+	}
+
+	gui::DestroyImGui();
+	gui::DestroyDevice();
+	gui::DestroyHWindow();
+
+	FreeConsole();
+	return EXIT_SUCCESS;
+};

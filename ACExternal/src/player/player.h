@@ -78,7 +78,11 @@ struct Player
 	void setTeam(HANDLE hProcess, Team team);
 	void setName(HANDLE hProcess, char name[16]);
 	void setCurrentWeapon(HANDLE hProcess, const char* weapon);
+	void setPosition(HANDLE hProcess, Vector3 position);
+	void setView(HANDLE hProcess, Vector3 view);
 
+
+	void toggleAttacking(HANDLE hProcess, bool attacking);
 	void toggleFlyHack(HANDLE hProcess, bool flyHack);
 	void toggleGhostmode(HANDLE hProcess, bool ghostMode);
 };

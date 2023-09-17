@@ -1,12 +1,25 @@
 #pragma once
 
 #include "../stdafx.h"
+#include <cmath>
+#include <numbers>
 
 struct Vector3
 {
-	float z; //0x0000
-	float x; //0x0004
+	Vector3(
+		const float x = 0.f,
+		const float z = 0.f,
+		const float y = 0.f)
+		: x(x), z(z), y(y) {};
+
+	float x; //0x0000
+	float z; //0x0004
 	float y; //0x0008
+
+	const bool IsZero() const noexcept
+	{
+		return x == 0.f && y == 0.f && z == 0.f;
+	}
 };
 
 
@@ -25,3 +38,5 @@ struct Collider
 	float stand; //0x0008
 	float width; //0x000C
 };
+
+Vector3 CalculateAngles(Vector3& localPosition, Vector3& enemyPosition);
