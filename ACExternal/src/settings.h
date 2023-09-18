@@ -24,5 +24,5 @@ namespace settings
 
 	extern int aimbotMinDistance;
 	extern int aimbotMaxDistance;
-
+	extern int freezeEnemies;
 }

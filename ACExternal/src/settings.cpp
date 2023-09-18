@@ -11,16 +11,17 @@ namespace settings
 	bool ghostMode = false;
 
 	// weapon related settings
-	bool noRecoil = false;
+	bool noRecoil = true;
 	bool godMode = false;
-	bool infiniteAmmo = false;
+	bool infiniteAmmo = true;
 	bool instantReload = false;
 	bool rapidFire = false;
 	bool noSpray = false;
 	bool noShake = false;
-	bool fullAuto = false;
+	bool fullAuto = true;
 	bool oneTap = false;
 	bool aimbot = false;
+	bool freezeEnemies = false;
 
 	int aimbotMinDistance = 0;
 	int aimbotMaxDistance = 50;

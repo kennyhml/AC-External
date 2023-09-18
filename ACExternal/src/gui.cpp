@@ -242,13 +242,13 @@ void gui::Render() noexcept
 			"Fly Hack", "Ghost Mode", "God Mode", "No Gravity",
 			"No Recoil", "No Spray", "No Reload", "Rapid Fire", 
 			"Inf. Ammo", "No Shake", "Full Auto", "One Tap",
-			"Aimbot"
+			"Aimbot", "Freez Enemies"
 		};
 		bool* checkboxValues[] = {
 			&settings::flyHack, &settings::ghostMode, &settings::godMode, &settings::antiGravity,
 			&settings::noRecoil, &settings::noSpray, &settings::instantReload, &settings::rapidFire, 
 			&settings::infiniteAmmo, &settings::noShake, &settings::fullAuto, &settings::oneTap,
-			&settings::aimbot
+			&settings::aimbot, &settings::freezeEnemies
 		};
 
 		for (int i = 0; i < 13; i++)
