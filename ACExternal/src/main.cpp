@@ -2,10 +2,10 @@
 #include "stdafx.h"
 #include "settings.h"
 #include "gui.h"
-#include "proc.h"
+#include "tools/proc.h"
+#include "tools/mem.h"
 #include "player/player.h"
 #include "weapon/weapon.h"
-#include "mem.h"
 
 #include <Windows.h>
 #include <thread>

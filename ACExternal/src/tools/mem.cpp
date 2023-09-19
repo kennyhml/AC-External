@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #include "mem.h"
+#include "../stdafx.h"
 
 
 void PatchEx(BYTE* dst, BYTE* src, unsigned int size, HANDLE hProcess)

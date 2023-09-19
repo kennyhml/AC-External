@@ -1,10 +1,10 @@
 #pragma once
 
 #include "geometry.h"
-#include <string>
+#include "enums.h"
+
 #include "../stdafx.h"
 #include "../weapon/weapon.h"
-#include "enums.h"
 
 struct Player
 {

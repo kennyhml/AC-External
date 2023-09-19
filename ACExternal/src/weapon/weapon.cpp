@@ -1,6 +1,6 @@
 
 #include "weapon.h"
-#include "../mem.h"
+#include "../tools/mem.h"
 
 /**
  * Loads a weapon object from the given address in the target process.
@@ -153,7 +153,7 @@ void Weapon::toggleWeaponShake(HANDLE hProcess, bool weaponShake)
 {
 	uintptr_t shakeHorizonalAddr = dataPointer + 0x011A;
 	uintptr_t shakeVerticalAddr = dataPointer + 0x011C;
-	
+
 	int16_t value = weaponShake ? 4 : 0;
 	PatchEx((BYTE*)shakeHorizonalAddr, (BYTE*)&value, sizeof(value), hProcess);
 	PatchEx((BYTE*)shakeVerticalAddr, (BYTE*)&value, sizeof(value), hProcess);

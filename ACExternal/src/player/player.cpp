@@ -1,7 +1,6 @@
 #include "player.h"
-#include "../mem.h"
+#include "../tools/mem.h"
 #include "../weapon/weapon.h"
-#include <array>
 
 /**
  * @brief Loads a player at a given memory address, including it's weapons.

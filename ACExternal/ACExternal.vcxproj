@@ -168,8 +168,8 @@
     <ClCompile Include="src\settings.h" />
     <ClCompile Include="src\player\geometry.cpp" />
     <ClCompile Include="src\player\player.cpp" />
-    <ClCompile Include="src\mem.cpp" />
-    <ClCompile Include="src\proc.cpp" />
+    <ClCompile Include="src\tools\mem.cpp" />
+    <ClCompile Include="src\tools\proc.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\weapon\weapon.cpp" />
   </ItemGroup>
@@ -188,8 +188,8 @@
     <ClInclude Include="src\weapon\reserveData.h" />
     <ClInclude Include="src\player\geometry.h" />
     <ClInclude Include="src\player\player.h" />
-    <ClInclude Include="src\mem.h" />
-    <ClInclude Include="src\proc.h" />
+    <ClInclude Include="src\tools\mem.h" />
+    <ClInclude Include="src\tools\proc.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\weapon\weapon.h" />
     <ClInclude Include="src\weapon\weaponData.h" />

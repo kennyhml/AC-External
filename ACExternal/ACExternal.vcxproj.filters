@@ -18,10 +18,10 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\proc.cpp">
+    <ClCompile Include="src\tools\proc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\mem.cpp">
+    <ClCompile Include="src\tools\mem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\player\player.cpp">
@@ -68,13 +68,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\proc.h">
+    <ClInclude Include="src\tools\proc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\mem.h">
+    <ClInclude Include="src\tools\mem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\player\player.h">
