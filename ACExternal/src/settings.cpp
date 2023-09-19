@@ -22,9 +22,11 @@ namespace settings
 	bool oneTap = false;
 	bool aimbot = false;
 	bool freezeEnemies = false;
+	bool speedEnabled = false;
 
 	int aimbotMinDistance = 0;
 	int aimbotMaxDistance = 50;
+	int aimbotRadius = 15;
 
 
 }

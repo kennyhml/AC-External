@@ -21,8 +21,10 @@ namespace settings
 	extern bool fullAuto;
 	extern bool oneTap;
 	extern bool aimbot;
+	extern bool freezeEnemies;
+	extern bool speedEnabled;
 
 	extern int aimbotMinDistance;
 	extern int aimbotMaxDistance;
-	extern int freezeEnemies;
+	extern int aimbotRadius;
 }

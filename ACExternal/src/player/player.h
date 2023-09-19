@@ -79,7 +79,7 @@ struct Player
 	void setName(HANDLE hProcess, char name[16]);
 	void setCurrentWeapon(HANDLE hProcess, const char* weapon);
 	void setPosition(HANDLE hProcess, Vector3 position);
-	void setView(HANDLE hProcess, Vector3 view);
+	void setView(HANDLE hProcess, Vector3& view);
 
 
 	void toggleAttacking(HANDLE hProcess, bool attacking);

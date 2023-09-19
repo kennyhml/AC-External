@@ -8,14 +8,26 @@
 #include "mem.h"
 
 #include <Windows.h>
-
-
+#include <thread>
+#include "esp.h"
 
 static uintptr_t entityListAddress;
 static uintptr_t localPlayerAddress;
-static uintptr_t playerCountAddress;
 static uintptr_t modBaseAddress;
 
+static void CheckKeyPresses()
+{
+	if (GetAsyncKeyState(VK_F1) & 1) { settings::aimbot = !settings::aimbot; }
+	if (GetAsyncKeyState(VK_F2) & 1) { settings::speedEnabled = !settings::speedEnabled; }
+	if (GetAsyncKeyState(VK_F3) & 1) { settings::rapidFire = !settings::rapidFire; }
+	if (GetAsyncKeyState(VK_F4) & 1) { settings::noRecoil = !settings::noRecoil; }
+	if (GetAsyncKeyState(VK_F5) & 1) { settings::flyHack = !settings::flyHack; }
+	if (GetAsyncKeyState(VK_F6) & 1) { settings::ghostMode = !settings::ghostMode; }
+	if (GetAsyncKeyState(VK_F7) & 1) { settings::infiniteAmmo = !settings::infiniteAmmo; }
+	if (GetAsyncKeyState(VK_F8) & 1) { settings::freezeEnemies = !settings::freezeEnemies; }
+	if (GetAsyncKeyState(VK_F9) & 1) { settings::flyHack = !settings::flyHack; }
+	if (GetAsyncKeyState(VK_F10) & 1) { settings::flyHack = !settings::flyHack; }
+}
 
 static HANDLE GetProcessHandle(DWORD& pid)
 {
@@ -39,32 +51,37 @@ static void Aimbot(HANDLE hProcess, Player& localPlayer)
 	int playerCount = GetPlayerCount(hProcess, modBaseAddress);
 	auto players = LoadPlayers(hProcess, playerCount, entityListAddress);
 
-	int closestDistance = 999999999;
+	float closestDiff = -1.f;
 	Player closestEnemy = NULL;
-	bool enemyFound = false;
 
 	for (Player& enemy : players)
 	{
 		// Don't aimbot friendlies or dead players
 		if (!enemy.isEnemy(localPlayer.team) || !enemy.isValid()) { continue; }
 
-		int distance = GetDistance(localPlayer.headPos, enemy.headPos);
+		float distance = GetDistance(localPlayer.headPos, enemy.headPos);
 		if (distance > settings::aimbotMaxDistance || distance < settings::aimbotMinDistance) { continue; }
 
-		if (distance < closestDistance)
+		auto perfAngle = CalculateAngle(localPlayer.headPos, enemy.headPos);
+		auto currAngle = localPlayer.viewAngle;
+
+		Vector3 diff = { perfAngle.x - currAngle.x, perfAngle.z - currAngle.z, 0.f };
+
+		if (abs(diff.x) > settings::aimbotRadius || abs(diff.y) > settings::aimbotRadius) { continue; }
+
+		float totalDiff = abs(diff.x) + abs(diff.y);
+		if (totalDiff < closestDiff || closestDiff == -1)
 		{
-			closestDistance = distance;
+			closestDiff = totalDiff;
 			closestEnemy = enemy;
-			enemyFound = true;
 		}
 	}
 
-	if (!enemyFound) { return; }
+	if (closestDiff == -1) { return; }
 	std::cout << "[+] Closest enemy to aimbot: " << closestEnemy.name << "\n!";
 
 	Vector3 angle = CalculateAngle(localPlayer.headPos, closestEnemy.headPos);
 	localPlayer.setView(hProcess, angle);
-
 }
 
 
@@ -82,8 +99,10 @@ static void InstaKillEveryone(HANDLE hProcess, Player localPlayer, std::vector<P
 	for (Player& targetPlayer : players) {
 		targetPlayer = LoadPlayer(hProcess, targetPlayer.baseAddress);
 
-		if (targetPlayer.team == localPlayer.team || 
-			targetPlayer.status != Status::Alive ) { continue; }
+		if (targetPlayer.team == localPlayer.team ||
+			targetPlayer.status != Status::Alive) {
+			continue;
+		}
 
 		while (targetPlayer.status == Status::Alive) {
 			localPlayer.setHealth(hProcess, 9999);
@@ -174,9 +193,13 @@ int WINAPI WinMain(
 	HANDLE hProcess = GetProcessHandle(pid);
 	entityListAddress = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F8);
 	localPlayerAddress = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F4);
-	playerCountAddress = GetPointedAddress(hProcess, modBaseAddress + 0x10F500);
 
-	Sleep(3000);
+	ESP::TargetWnd = FindWindow(0, "AssaultCube");
+	ESP::HDC_Desktop = GetDC(ESP::TargetWnd);
+	ESP::SetupDrawing(ESP::HDC_Desktop, ESP::TargetWnd);
+
+	std::thread espThread(ESP::Run, hProcess, modBaseAddress, localPlayerAddress, entityListAddress, std::ref(gui::exit));
+	espThread.detach();
 
 	while (gui::exit)
 	{
@@ -184,9 +207,10 @@ int WINAPI WinMain(
 		gui::Render();
 		gui::EndRender();
 
+		CheckKeyPresses();
 		WriteSettingsToClient(hProcess);
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
-
 	gui::DestroyImGui();
 	gui::DestroyDevice();
 	gui::DestroyHWindow();

@@ -131,12 +131,11 @@ void Player::setPosition(HANDLE hProcess, Vector3 position)
  * @param hProcess A handle to the target process for memory modification.
  * @param view The new view of the player.
  */
-void Player::setView(HANDLE hProcess, Vector3 view)
+void Player::setView(HANDLE hProcess, Vector3& view)
 {
-	Vector3 newView = { view.x, view.y, 0.f };
 
 	uintptr_t targetAddress = baseAddress + 0x40;
-	PatchEx((BYTE*)targetAddress, (BYTE*)&newView, sizeof(newView), hProcess);
+	PatchEx((BYTE*)targetAddress, (BYTE*)&view, sizeof(view), hProcess);
 }
 
 /**

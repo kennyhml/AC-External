@@ -4,15 +4,20 @@
 
 struct Vector3
 {
+	float x; //0x0000
+	float y; //0x0004
+	float z; //0x0008
+
 	Vector3(
 		const float x = 0.f,
-		const float z = 0.f,
-		const float y = 0.f)
-		: x(x), z(z), y(y) {};
+		const float y = 0.f,
+		const float z = 0.f)
+		: x(x), y(y), z(z) {};
 
-	float x; //0x0000
-	float z; //0x0004
-	float y; //0x0008
+	const Vector3& operator-(const Vector3& other) noexcept
+	{
+		return Vector3{ x - other.x, y - other.y, z - other.z };
+	}
 
 	const bool IsZero() const noexcept
 	{
@@ -39,3 +44,4 @@ struct Collider
 
 Vector3 CalculateAngle(Vector3& localPosition, Vector3& enemyPosition);
 float GetDistance(Vector3 localPosition, Vector3 enemyPosition);
+bool WorldToScreen(Vector3& position, Vector3& screen, float viewMatrix[16], int windowWidth, int windowHeight);
