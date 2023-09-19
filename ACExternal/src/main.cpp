@@ -187,9 +187,7 @@ int WINAPI WinMain(
 {
 	if (!SetupConsole()) { return EXIT_FAILURE; };
 
-
 	DWORD pid = 0;
-	modBaseAddress = 0;
 	HANDLE hProcess = GetProcessHandle(pid);
 	entityListAddress = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F8);
 	localPlayerAddress = GetPointedAddress(hProcess, modBaseAddress + 0x10F4F4);

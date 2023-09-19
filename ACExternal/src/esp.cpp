@@ -4,7 +4,6 @@
 #include <sstream>
 #include "settings.h"
 
-
 DWORD WINAPI ESP::Run(HANDLE hProcess, uintptr_t modBaseAddress, uintptr_t localPlayerAddress, uintptr_t entityListAddress, bool& exit)
 {
 	TargetWnd = FindWindow(0, "AssaultCube");
