@@ -23,6 +23,7 @@ namespace settings
 	extern bool aimbot;
 	extern bool freezeEnemies;
 	extern bool speedEnabled;
+	extern bool esp;
 
 	extern int aimbotMinDistance;
 	extern int aimbotMaxDistance;

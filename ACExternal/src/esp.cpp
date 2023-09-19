@@ -2,6 +2,8 @@
 #include "player/player.h"
 #include <thread>
 #include <sstream>
+#include "settings.h"
+
 
 DWORD WINAPI ESP::Run(HANDLE hProcess, uintptr_t modBaseAddress, uintptr_t localPlayerAddress, uintptr_t entityListAddress, bool& exit)
 {
@@ -18,6 +20,9 @@ DWORD WINAPI ESP::Run(HANDLE hProcess, uintptr_t modBaseAddress, uintptr_t local
 
 	while (exit)
 	{
+		DrawCircle(640 / 2, 480 / 2, settings::aimbotRadius * 3, 1, cfTeam);
+		if (!settings::esp) { continue; }
+
 		GetWindowRect(FindWindow(NULL, "AssaultCube"), &rect);
 
 		int playerCount = GetPlayerCount(hProcess, modBaseAddress);
@@ -80,6 +85,7 @@ void ESP::DrawString(int x, int y, COLORREF color, const char* text)
 	SelectObject(HDC_Desktop, Font);
 	TextOutA(HDC_Desktop, x, y, text, strlen(text));
 	DeleteObject(Font);
+
 }
 
 
@@ -102,9 +108,17 @@ void ESP::DrawLine(float StartX, float StartY, float EndX, float EndY, COLORREF 
 	DeleteObject(SelectObject(HDC_Desktop, hOPen));
 }
 
+void ESP::DrawCircle(int x, int y, int radius, int thickness, COLORREF color)
+{
+	HPEN hOPen;
+	HPEN hNPen = CreatePen(PS_SOLID, thickness, color);
+	hOPen = (HPEN)SelectObject(HDC_Desktop, hNPen);
+	Arc(HDC_Desktop, x - radius, y - radius, x + radius, y + radius, 0, 0, 0, 0);
+	DeleteObject(SelectObject(HDC_Desktop, hOPen));
+}
+
 void ESP::SetupDrawing(HDC hDesktop, HWND handle)
 {
 	HDC_Desktop = hDesktop;
 	Handle = handle;
-	TextCOLOR = RGB(0, 255, 0);
 }

@@ -5,7 +5,7 @@
 namespace gui
 {
 	// window boundaries
-	constexpr int WIDTH = 500;
+	constexpr int WIDTH = 550;
 	constexpr int HEIGHT = 300;
 
 	inline bool exit = true;
@@ -21,7 +21,7 @@ namespace gui
 	inline PDIRECT3D9 d3d = nullptr;
 	inline LPDIRECT3DDEVICE9 device = nullptr;
 	inline D3DPRESENT_PARAMETERS presentParameters = {};
-	
+
 	// window creation & destruction
 	void CreateHWindow(const char* windowName, const char* className) noexcept;
 	void DestroyHWindow() noexcept;

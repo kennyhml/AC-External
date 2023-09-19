@@ -23,6 +23,7 @@ namespace settings
 	bool aimbot = false;
 	bool freezeEnemies = false;
 	bool speedEnabled = false;
+	bool esp = true;
 
 	int aimbotMinDistance = 0;
 	int aimbotMaxDistance = 50;

@@ -30,7 +30,7 @@ long __stdcall WindowProcess(
 			gui::ResetDevice();
 		}
 	}return 0;
-		
+
 	case WM_SYSCOMMAND: {
 		if ((wideParameter & 0xfff0) == SC_KEYMENU) { return 0; };
 	}break;
@@ -145,13 +145,13 @@ void gui::ResetDevice() noexcept
 
 void gui::DestroyDevice() noexcept
 {
-	if (device) 
+	if (device)
 	{
 		device->Release();
 		device = nullptr;
 	}
 
-	if (d3d) 
+	if (d3d)
 	{
 		d3d->Release();
 		d3d = nullptr;
@@ -183,7 +183,7 @@ void gui::BeginRender() noexcept
 {
 	MSG message;
 
-	while (PeekMessage(&message, 0, 0, 0, PM_REMOVE)) 
+	while (PeekMessage(&message, 0, 0, 0, PM_REMOVE))
 	{
 		TranslateMessage(&message);
 		DispatchMessage(&message);
@@ -239,16 +239,16 @@ void gui::Render() noexcept
 	{
 		// Checkbox labels and values
 		const char* checkboxLabels[] = {
-			"Fly Hack", "Ghost Mode", "God Mode", "No Gravity",
-			"No Recoil", "No Spray", "No Reload", "Rapid Fire", 
-			"Inf. Ammo", "No Shake", "Full Auto", "One Tap",
-			"Aimbot", "Freez Enemies"
+			"Aimbot (Ctrl)", "Player ESP (F1)", "God Mode (F2)", "Speedhack (F3)",
+			"No Recoil (F4)", "Rapid Fire (F5)", "Inf. Ammo (F6)", "No Spray (F7)",
+			"Fly hack (F8)", "Ghost Mode (F9)", "Full Auto (F10)", "One Tap",
+			"Freeze Enemies"
 		};
 		bool* checkboxValues[] = {
-			&settings::flyHack, &settings::ghostMode, &settings::godMode, &settings::antiGravity,
-			&settings::noRecoil, &settings::noSpray, &settings::instantReload, &settings::rapidFire, 
-			&settings::infiniteAmmo, &settings::noShake, &settings::fullAuto, &settings::oneTap,
-			&settings::aimbot, &settings::freezeEnemies
+			&settings::aimbot, &settings::esp, &settings::godMode, &settings::speedEnabled,
+			&settings::noRecoil, &settings::rapidFire, &settings::infiniteAmmo, &settings::noSpray,
+			&settings::flyHack, &settings::ghostMode, &settings::fullAuto, &settings::oneTap,
+			&settings::freezeEnemies
 		};
 
 		for (int i = 0; i < 13; i++)
@@ -276,10 +276,10 @@ void gui::Render() noexcept
 	ImGui::SliderInt("Knockback", &settings::knockback, -100, 100);
 
 	static int selectedItem = 0;
-	const char* items[] = { "Assault Rifle", "Sniper Rifle", "Shotgun", "Grenade", "Carbine", "Akimbo"};
+	const char* items[] = { "Assault Rifle", "Sniper Rifle", "Shotgun", "Grenade", "Carbine", "Akimbo" };
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(120.0f);
-	if (ImGui::Combo("Weapon", &selectedItem, items, IM_ARRAYSIZE(items))) 
+	if (ImGui::Combo("Weapon", &selectedItem, items, IM_ARRAYSIZE(items)))
 	{
 		settings::selectedWeapon = items[selectedItem];
 	}

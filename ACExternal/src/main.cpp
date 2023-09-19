@@ -17,16 +17,17 @@ static uintptr_t modBaseAddress;
 
 static void CheckKeyPresses()
 {
-	if (GetAsyncKeyState(VK_F1) & 1) { settings::aimbot = !settings::aimbot; }
-	if (GetAsyncKeyState(VK_F2) & 1) { settings::speedEnabled = !settings::speedEnabled; }
-	if (GetAsyncKeyState(VK_F3) & 1) { settings::rapidFire = !settings::rapidFire; }
+	settings::aimbot = GetAsyncKeyState(VK_CONTROL) & 0x8000;
+	if (GetAsyncKeyState(VK_F1) & 1) { settings::esp = !settings::esp; }
+	if (GetAsyncKeyState(VK_F2) & 1) { settings::godMode = !settings::godMode; }
+	if (GetAsyncKeyState(VK_F3) & 1) { settings::speedEnabled = !settings::speedEnabled; }
 	if (GetAsyncKeyState(VK_F4) & 1) { settings::noRecoil = !settings::noRecoil; }
-	if (GetAsyncKeyState(VK_F5) & 1) { settings::flyHack = !settings::flyHack; }
-	if (GetAsyncKeyState(VK_F6) & 1) { settings::ghostMode = !settings::ghostMode; }
-	if (GetAsyncKeyState(VK_F7) & 1) { settings::infiniteAmmo = !settings::infiniteAmmo; }
-	if (GetAsyncKeyState(VK_F8) & 1) { settings::freezeEnemies = !settings::freezeEnemies; }
-	if (GetAsyncKeyState(VK_F9) & 1) { settings::flyHack = !settings::flyHack; }
-	if (GetAsyncKeyState(VK_F10) & 1) { settings::flyHack = !settings::flyHack; }
+	if (GetAsyncKeyState(VK_F5) & 1) { settings::rapidFire = !settings::rapidFire; }
+	if (GetAsyncKeyState(VK_F6) & 1) { settings::infiniteAmmo = !settings::infiniteAmmo; }
+	if (GetAsyncKeyState(VK_F7) & 1) { settings::noSpray = !settings::noSpray; }
+	if (GetAsyncKeyState(VK_F8) & 1) { settings::flyHack = !settings::flyHack; }
+	if (GetAsyncKeyState(VK_F9) & 1) { settings::ghostMode = !settings::ghostMode; }
+	if (GetAsyncKeyState(VK_F10) & 1) { settings::fullAuto = !settings::fullAuto; }
 }
 
 static HANDLE GetProcessHandle(DWORD& pid)
@@ -55,7 +56,6 @@ static void Aimbot(HANDLE hProcess, Player& localPlayer)
 
 	float closestDiff = -1.f;
 	Player closestEnemy = NULL;
-
 
 	for (Player& enemy : players)
 	{
