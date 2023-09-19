@@ -26,3 +26,30 @@ enum class Status : int32_t
 	Dead = 1,
 	Spectate = 5
 };
+
+
+enum class GameMode : int32_t
+{
+	TeamDeathmatch,
+	Coop,
+	Deathmatch,
+	Survivor,
+	TeamSurvivor,
+	CaptureTheFlag,
+	PistolFrenzy,
+	BotTeamDeathmatch,
+	BotDeathmatch,
+	LastSwissStanding,
+	OneShotOneKill,
+	TeamOneShotOneKill,
+	BotOneShotOneKill,
+	HuntTheFlag,
+	TeamKeepTheFlag,
+	KeepTheFlag,
+	TeamPistolFrenzy,
+	TeamLastSwissStanding,
+	BotPistolFrenz,
+	BotLastSwissStanding,
+	BotTeamSurvivor,
+	BotTeamOneShotOneKill,
+};

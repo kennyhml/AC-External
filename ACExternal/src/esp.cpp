@@ -1,11 +1,21 @@
 #include "esp.h"
 #include "player/player.h"
 #include <thread>
-
-
+#include <sstream>
 
 DWORD WINAPI ESP::Run(HANDLE hProcess, uintptr_t modBaseAddress, uintptr_t localPlayerAddress, uintptr_t entityListAddress, bool& exit)
 {
+	TargetWnd = FindWindow(0, "AssaultCube");
+	HDC_Desktop = GetDC(TargetWnd);
+	SetupDrawing(HDC_Desktop, TargetWnd);
+
+	COLORREF cfEnemy = RGB(255, 0, 0);
+	COLORREF cfTeam = RGB(0, 255, 0);
+
+	HBRUSH hBrushEnemy = CreateSolidBrush(cfEnemy);
+	HBRUSH hBrushTeam = CreateSolidBrush(cfTeam);
+
+
 	while (exit)
 	{
 		GetWindowRect(FindWindow(NULL, "AssaultCube"), &rect);
@@ -16,26 +26,62 @@ DWORD WINAPI ESP::Run(HANDLE hProcess, uintptr_t modBaseAddress, uintptr_t local
 		Vector3 screen;
 		float matrix[16];
 
-		ReadProcessMemory(hProcess, (BYTE*)0x501AE8, &matrix, sizeof(matrix), nullptr);
-		for (Player& enemy : players)
-		{
-			if (WorldToScreen(enemy.feetPos, screen, matrix, 640, 480))
-			{
-				float distance = GetDistance(localPlayer.headPos, enemy.headPos);
-				int rectW = 1100 / distance;
-				int rectH = 2000 / distance;
+		GameMode mode = GetGameMode(hProcess, modBaseAddress);
 
-				DrawBorderBox(screen.x - (rectW / 2), screen.y - rectH, rectW, rectH, 1, CreateSolidBrush(RGB(255, 0, 0)));
-			}
+		ReadProcessMemory(hProcess, (BYTE*)0x501AE8, &matrix, sizeof(matrix), nullptr);
+		for (Player& player : players)
+		{
+			if (player.status != Status::Alive) { continue; }
+
+			// Get the position from the view matrix, false if the player isnt visible to us
+			if (!WorldToScreen(player.feetPos, screen, matrix, 640, 480)) { continue; }
+
+			HBRUSH hBrush = player.isEnemy(localPlayer.team, mode) ? hBrushEnemy : hBrushTeam;
+			COLORREF cf = player.isEnemy(localPlayer.team, mode) ? cfEnemy : cfTeam;
+
+			float distance = GetDistance(localPlayer.headPos, player.headPos);
+
+			int rectW = 1100 / distance;
+			int rectH = 2000 / distance;
+			DrawBorderBox(screen.x - (rectW / 2), screen.y - rectH, rectW, rectH, 1, hBrush);
+			DrawLine((rect.right - rect.left) / 2, rect.bottom - rect.top, screen.x, screen.y, cf);
+
+			std::stringstream oss;
+			oss << std::fixed << (int)distance << "m";
+
+			const std::string resultString = oss.str();
+			const char* cstr = resultString.c_str();
+
+			std::stringstream hss;
+			hss << std::fixed << player.health << " HP";
+
+			const std::string hRes = hss.str();
+			const char* hstr = hRes.c_str();
+
+			DrawString(screen.x, screen.y, cf, player.name);
+			DrawString(screen.x, screen.y + 15, cf, cstr);
+			DrawString(screen.x, screen.y + 30, cf, hstr);
 		}
 	}
 }
 
 void ESP::DrawFilledRect(int x, int y, int w, int h, HBRUSH brushColor)
 {
-	RECT rect = { x,y,x + w,y + h };
+	RECT rect = { x, y, x + w, y + h };
 	FillRect(HDC_Desktop, &rect, brushColor);
 }
+
+void ESP::DrawString(int x, int y, COLORREF color, const char* text)
+{
+	SetTextAlign(HDC_Desktop, TA_CENTER | TA_NOUPDATECP);
+	SetBkColor(HDC_Desktop, RGB(0, 0, 0));
+	SetBkMode(HDC_Desktop, TRANSPARENT);
+	SetTextColor(HDC_Desktop, color);
+	SelectObject(HDC_Desktop, Font);
+	TextOutA(HDC_Desktop, x, y, text, strlen(text));
+	DeleteObject(Font);
+}
+
 
 void ESP::DrawBorderBox(int x, int y, int w, int h, int thickness, HBRUSH brushColor)
 {

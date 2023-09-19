@@ -85,7 +85,7 @@ struct Player
 	void toggleAttacking(HANDLE hProcess, bool attacking);
 	void toggleFlyHack(HANDLE hProcess, bool flyHack);
 	void toggleGhostmode(HANDLE hProcess, bool ghostMode);
-	bool isEnemy(Team localPlayerTeam);
+	bool isEnemy(Team localPlayerTeam, GameMode mode);
 	bool isValid();
 
 };
@@ -96,3 +96,4 @@ std::vector<Player> LoadPlayers(HANDLE hProcess, int playerCount, uintptr_t enti
 void ToggleAntiGravtiy(HANDLE hProcess, uintptr_t modBaseAddress, bool antiGravity);
 void ToggleSpeedHack(HANDLE hProcess, uintptr_t modBaseAddress, uint8_t speed);
 int GetPlayerCount(HANDLE hProcess, uintptr_t modBaseAddress);
+GameMode GetGameMode(HANDLE hProcess, uintptr_t modBaseAddress);

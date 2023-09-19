@@ -16,6 +16,5 @@ namespace ESP
 	void DrawBorderBox(int x, int y, int w, int h, int thickness, HBRUSH brushColor);
 	void DrawLine(float StartX, float StartY, float EndX, float EndY, COLORREF Pen);
 	void SetupDrawing(HDC hDesktop, HWND handle);
-
+	void DrawString(int x, int y, COLORREF color, const char* text);
 }
-

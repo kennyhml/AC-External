@@ -226,9 +226,14 @@ void ToggleAntiGravtiy(HANDLE hProcess, uintptr_t modBaseAddress, bool antiGravi
 };
 
 
-bool Player::isEnemy(Team localPlayerTeam)
+bool Player::isEnemy(Team localPlayerTeam, GameMode mode)
 {
-	return team != localPlayerTeam;
+	return (
+		team != localPlayerTeam
+		|| mode == GameMode::BotDeathmatch || mode == GameMode::Deathmatch
+		|| mode == GameMode::BotOneShotOneKill || mode == GameMode::OneShotOneKill
+		|| mode == GameMode::BotPistolFrenz || mode == GameMode::PistolFrenzy
+		|| mode == GameMode::BotLastSwissStanding || mode == GameMode::LastSwissStanding);
 }
 
 bool Player::isValid()
@@ -242,4 +247,12 @@ int GetPlayerCount(HANDLE hProcess, uintptr_t modBaseAddress)
 	uintptr_t targetAddress = modBaseAddress + 0x10F500;
 	ReadProcessMemory(hProcess, (BYTE*)targetAddress, &count, sizeof(count), nullptr);
 	return count;
+}
+
+GameMode GetGameMode(HANDLE hProcess, uintptr_t modBaseAddress)
+{
+	int mode;
+	uintptr_t targetAddress = modBaseAddress + 0x10F49C;
+	ReadProcessMemory(hProcess, (BYTE*)targetAddress, &mode, sizeof(mode), nullptr);
+	return GameMode(mode);
 }
