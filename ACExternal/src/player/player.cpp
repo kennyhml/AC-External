@@ -85,6 +85,12 @@ void Player::setName(HANDLE hProcess, char name[16])
 	PatchEx((BYTE*)targetAddress, (BYTE*)name, strlen(name), hProcess);
 }
 
+/**
+ * @brief Sets the current weapon of the player to the given weapon.
+ *
+ * @param hProcess A handle to the target process for memory modification.
+ * @param weapon The name of the weapon to equip.
+ */
 void Player::setCurrentWeapon(HANDLE hProcess, const char* weapon)
 {
 	if (weapon == NULL) { return; }
@@ -97,7 +103,6 @@ void Player::setCurrentWeapon(HANDLE hProcess, const char* weapon)
 	else if (!strcmp(weapon, "Carbine")) { weaponPointer = carbinePointer; }
 	else if (!strcmp(weapon, "Akimbo")) { weaponPointer = akimboPistolPointer; }
 	else if (!strcmp(weapon, "Knife")) { weaponPointer = knifePointer; }
-
 	else {
 		throw std::runtime_error("Unknown weapon!");
 	}
@@ -226,7 +231,12 @@ void ToggleAntiGravtiy(HANDLE hProcess, uintptr_t modBaseAddress, bool antiGravi
 	}
 };
 
-
+/**
+ * @brief Returns whether this player is an enemy given the local players team & mode.
+ *
+ * @param localPlayerTeam The Team of the local player (our team)
+ * @param mode The GameMode of the current game as some modes dont have teams.
+ */
 bool Player::isEnemy(Team localPlayerTeam, GameMode mode) const
 {
 	return (
@@ -237,11 +247,12 @@ bool Player::isEnemy(Team localPlayerTeam, GameMode mode) const
 		|| mode == GameMode::BotLastSwissStanding || mode == GameMode::LastSwissStanding);
 }
 
-bool Player::isValid()
-{
-	return status == Status::Alive && health > 0 && health < 9999;
-}
-
+/**
+ * @brief Returns the player count of the current game.
+ *
+ * @param hProcess A handle to the target process for memory modification.
+ * @param modBaseAddress The base address of the module.
+ */
 int GetPlayerCount(HANDLE hProcess, uintptr_t modBaseAddress)
 {
 	int count;
@@ -250,6 +261,12 @@ int GetPlayerCount(HANDLE hProcess, uintptr_t modBaseAddress)
 	return count;
 }
 
+/**
+ * @brief Returns the game mode of the current game.
+ *
+ * @param hProcess A handle to the target process for memory modification.
+ * @param modBaseAddress The base address of the module.
+ */
 GameMode GetGameMode(HANDLE hProcess, uintptr_t modBaseAddress)
 {
 	int mode;

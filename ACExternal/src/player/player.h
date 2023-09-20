@@ -2,7 +2,6 @@
 
 #include "geometry.h"
 #include "enums.h"
-
 #include "../stdafx.h"
 #include "../weapon/weapon.h"
 
@@ -86,8 +85,6 @@ struct Player
 	void toggleFlyHack(HANDLE hProcess, bool flyHack);
 	void toggleGhostmode(HANDLE hProcess, bool ghostMode);
 	bool isEnemy(Team localPlayerTeam, GameMode mode) const;
-	bool isValid();
-
 };
 
 
