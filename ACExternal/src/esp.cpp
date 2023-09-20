@@ -4,7 +4,13 @@
 #include <sstream>
 #include "settings.h"
 
-
+/**
+ * @brief Draws a line from one point to another with a given color.
+ *
+ * @param x1, y2 The starting point of the line.
+ * @param x2, y2 The ending point of the line.
+ * @param color The color to draw the line with.
+ */
 void ESP::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 {
 	HPEN hNewPen = CreatePen(PS_SOLID, 2, color);
@@ -17,6 +23,14 @@ void ESP::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 	DeleteObject(SelectObject(HDC_Desktop, hOldPen));
 }
 
+/**
+ * @brief Draws a circle at a given position with a given radius.
+ *
+ * @param x, y The center of the circle.
+ * @param radius The radius of the circle.
+ * @param thickness The thickness of the circle line.
+ * @param color The color to draw the circle with.
+ */
 void ESP::DrawCircle(int x, int y, int radius, int thickness, COLORREF color)
 {
 	HPEN hNewPen = CreatePen(PS_SOLID, thickness, color);
@@ -26,13 +40,27 @@ void ESP::DrawCircle(int x, int y, int radius, int thickness, COLORREF color)
 	DeleteObject(SelectObject(HDC_Desktop, hOldPen));
 }
 
-
+/**
+ * @brief Draws a filled rectangle at the given region.
+ *
+ * @param x, y The top left corner of the rectangle.
+ * @param w The width of the rectangle.
+ * @param h The height of the rectangle.
+ * @param brushColor The color to draw the rectangle with.
+ */
 void ESP::DrawFilledRect(int x, int y, int w, int h, HBRUSH brushColor)
 {
 	RECT rect = { x, y, x + w, y + h };
 	FillRect(HDC_Desktop, &rect, brushColor);
 }
 
+/**
+ * @brief Draws text at the given location.
+ *
+ * @param x, y The position to draw the text at.
+ * @param color The color to draw the text with.
+ * @param text The text to draw.
+ */
 void ESP::DrawString(int x, int y, COLORREF color, const char* text)
 {
 	SetTextAlign(HDC_Desktop, TA_CENTER | TA_NOUPDATECP);
@@ -45,6 +73,14 @@ void ESP::DrawString(int x, int y, COLORREF color, const char* text)
 
 }
 
+/**
+ * @brief Draws a border box given a region.
+ *
+ * @param x, y The top left corner of the box.
+ * @param w, h The width and height of the box.
+ * @param thicknes The thickness of the box.
+ * @param brushColor The color to draw the box with.
+ */
 void ESP::DrawBorderBox(int x, int y, int w, int h, int thickness, HBRUSH brushColor)
 {
 	DrawFilledRect(x, y, w, thickness, brushColor);
@@ -53,6 +89,14 @@ void ESP::DrawBorderBox(int x, int y, int w, int h, int thickness, HBRUSH brushC
 	DrawFilledRect(x, y + h, w + thickness, thickness, brushColor);
 }
 
+/**
+ * @brief Draws the name, distance to and the health of the player on the screen.
+ *
+ * @param player The player to draw the information of.
+ * @param distance The distance to the player (to display).
+ * @param position The position of the player in 2D space.
+ * @param color The color to draw the information with.
+ */
 static void DrawPlayerData(const Player& player, int distance, Vector2 position, COLORREF color)
 {
 	std::stringstream distanceStream;
@@ -70,6 +114,15 @@ static void DrawPlayerData(const Player& player, int distance, Vector2 position,
 	ESP::DrawString(position.x, position.y + 15, color, healthInfo);
 }
 
+/**
+ * @brief Draws a player on the screen including a box around its position, a line to
+ * its position from the player, the players name, health, armor and the distance to it.
+ *
+ * @param player The player to draw the information of.
+ * @param player The local player.
+ * @param matrix The games view matrix.
+ * @param mode The GameMode of the current game.
+ */
 static void DrawPlayer(const Player& player, const Player& localPlayer, float matrix[16], GameMode mode)
 {
 	// Don't render dead players
@@ -102,6 +155,16 @@ static void DrawPlayer(const Player& player, const Player& localPlayer, float ma
 	DrawPlayerData(player, distance, position, refColor);
 }
 
+/**
+ * @brief Entry point for the ESP thread, displays the ESP if enabled until the cheat
+ * is terminated.
+ *
+ * @param hProcess The handle to the target process.
+ * @param modBaseAddress The modules base address in memory.
+ * @param localPlayerAddress The local player address in memory.
+ * @param entityListAddress The entity list address in memory.
+ * @param exit The exit flag of the GUI to shutdown the thread.
+ */
 DWORD WINAPI ESP::Run(HANDLE hProcess, uintptr_t modBaseAddress, uintptr_t localPlayerAddress, uintptr_t entityListAddress, bool& exit)
 {
 	TargetWnd = FindWindow(0, "AssaultCube");
