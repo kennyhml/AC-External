@@ -6,14 +6,18 @@
 #include "tools/mem.h"
 #include "player/player.h"
 #include "weapon/weapon.h"
-#include <Windows.h>
-#include <thread>
 #include "esp.h"
+#include <thread>
 
 static uintptr_t entityListAddress;
 static uintptr_t localPlayerAddress;
 static uintptr_t modBaseAddress;
 
+/**
+ * @brief Checks for key presses to enable / disable certain settings.
+ *
+ * Aimbot and fly hack are only enabled whilst the key is held down.
+ */
 static void CheckKeyPresses()
 {
 	settings::aimbot = GetAsyncKeyState(VK_CONTROL) & 0x8000;
@@ -31,6 +35,9 @@ static void CheckKeyPresses()
 	if (GetAsyncKeyState(VK_F10) & 1) { settings::fullAuto = !settings::fullAuto; }
 }
 
+/**
+ * @brief Creates a console for debugging purposes.
+ */
 static bool SetupConsole()
 {
 	if (!AllocConsole()) { return false; }
@@ -38,6 +45,11 @@ static bool SetupConsole()
 	return (freopen_s(&pFile, "CONOUT$", "w", stdout) != 0);
 }
 
+/**
+ * @brief Gets the handle to the process given its process ID, tries until success.
+ *
+ * @param pid The process ID of the target process.
+ */
 static HANDLE GetProcessHandle(DWORD& pid)
 {
 	while (!pid)
@@ -55,12 +67,19 @@ static HANDLE GetProcessHandle(DWORD& pid)
 	return OpenProcess(PROCESS_ALL_ACCESS, NULL, pid);
 }
 
+/**
+ * @brief Checks whether an enemys head is within the aimbot radius and our
+ * aimbot is enabled. If an enemy is found, the crosshair is locked onto his head.
+ * Does not consider dead or team players.
+ *
+ * @param hProcess The handle to the process.
+ * @param localPlayer Our local player.
+ */
 static void Aimbot(HANDLE hProcess, Player& localPlayer)
 {
 	int playerCount = GetPlayerCount(hProcess, modBaseAddress);
 	auto players = LoadPlayers(hProcess, playerCount, entityListAddress);
-
-	auto mode = GetGameMode(hProcess, modBaseAddress);
+	GameMode mode = GetGameMode(hProcess, modBaseAddress);
 
 	float closestDiff = -1.f;
 	Player closestEnemy = NULL;
@@ -68,7 +87,7 @@ static void Aimbot(HANDLE hProcess, Player& localPlayer)
 	for (Player& enemy : players)
 	{
 		// Don't aimbot friendlies or dead players
-		if (!enemy.isEnemy(localPlayer.team, mode) || !enemy.isValid()) { continue; }
+		if (!enemy.isEnemy(localPlayer.team, mode) || enemy.status != Status::Alive) { continue; }
 
 		float distance = GetDistance(localPlayer.headPos, enemy.headPos);
 		if (distance > settings::aimbotMaxDistance || distance < settings::aimbotMinDistance) { continue; }
@@ -95,10 +114,14 @@ static void Aimbot(HANDLE hProcess, Player& localPlayer)
 	localPlayer.setView(hProcess, angle);
 }
 
+/**
+ * @brief Writes all settings from our GUI into the client.
+ *
+ * @param hProcess The handle to the process.
+ */
 static void WriteSettingsToClient(HANDLE hProcess)
 {
 	Player localPlayer = LoadPlayer(hProcess, localPlayerAddress);
-
 	if (settings::godMode)
 	{
 		localPlayer.setArmor(hProcess, 999);

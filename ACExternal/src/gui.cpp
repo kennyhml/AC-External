@@ -216,9 +216,6 @@ void gui::EndRender() noexcept
 	{
 		ResetDevice();
 	}
-
-
-
 }
 
 void gui::Render() noexcept
