@@ -4,9 +4,7 @@
 
 struct Vector3
 {
-	float x; //0x0000
-	float y; //0x0004
-	float z; //0x0008
+	float x, y, z;
 
 	Vector3(
 		const float x = 0.f,
@@ -26,6 +24,11 @@ struct Vector3
 };
 
 
+struct Vector2
+{
+	float x, y;
+};
+
 struct IntVector3
 {
 	int32_t z; //0x0000
@@ -44,4 +47,4 @@ struct Collider
 
 Vector3 CalculateAngle(Vector3& localPosition, Vector3& enemyPosition);
 float GetDistance(Vector3 localPosition, Vector3 enemyPosition);
-bool WorldToScreen(Vector3& position, Vector3& screen, float viewMatrix[16], int windowWidth, int windowHeight);
+bool WorldToScreen(const Vector3& position, Vector2& screen, float viewMatrix[16], int windowWidth, int windowHeight);

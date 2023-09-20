@@ -158,11 +158,13 @@ void Player::toggleAttacking(HANDLE hProcess, bool attacking)
  */
 void Player::toggleFlyHack(HANDLE hProcess, bool flyHack)
 {
-	if (flyHack != (status == Status::Spectate)) { return; }
+	if (flyHack == (status == Status::Spectate)) { return; }
 
 	uintptr_t targetAddress = baseAddress + 0x338;
 	int value = flyHack ? (int)Status::Spectate : (int)Status::Alive;
 	PatchEx((BYTE*)targetAddress, (BYTE*)&value, sizeof(value), hProcess);
+
+	std::cout << (flyHack ? "[+] Fly activated!\n" : "[+] Fly deactivated!\n");
 }
 
 /**
@@ -225,7 +227,7 @@ void ToggleAntiGravtiy(HANDLE hProcess, uintptr_t modBaseAddress, bool antiGravi
 };
 
 
-bool Player::isEnemy(Team localPlayerTeam, GameMode mode)
+bool Player::isEnemy(Team localPlayerTeam, GameMode mode) const
 {
 	return (
 		team != localPlayerTeam

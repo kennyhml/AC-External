@@ -288,5 +288,18 @@ void gui::Render() noexcept
 		settings::selectedWeapon = NULL;
 	}
 
+	ImGui::NewLine();
+	ImGui::SetNextItemWidth(90.0f);
+	ImGui::SliderInt("Aimbot Radius", &settings::aimbotRadius, 1, 100);
+
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(90.0f);
+	ImGui::SliderInt("Aimbot max range", &settings::aimbotMaxDistance, 30, 200);
+	ImGui::SameLine();
+
+	ImGui::SetNextItemWidth(90.0f);
+	ImGui::SliderInt("Aimbot min range", &settings::aimbotMinDistance, 0, 50);
+	ImGui::SameLine();
+
 	ImGui::End();
 }

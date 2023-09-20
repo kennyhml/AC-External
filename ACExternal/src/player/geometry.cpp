@@ -26,7 +26,7 @@ Vector3 CalculateAngle(Vector3& localPosition, Vector3& enemyPosition)
 	return Vector3(yaw, pitch, 0);
 }
 
-bool WorldToScreen(Vector3& position, Vector3& screen, float viewMatrix[16], int windowWidth, int windowHeight)
+bool WorldToScreen(const Vector3& position, Vector2& screen, float viewMatrix[16], int windowWidth, int windowHeight)
 {
 	float x = position.x * viewMatrix[0] + position.y * viewMatrix[4] + position.z * viewMatrix[8] + viewMatrix[12];
 	float y = position.x * viewMatrix[1] + position.y * viewMatrix[5] + position.z * viewMatrix[9] + viewMatrix[13];

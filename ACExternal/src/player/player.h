@@ -85,7 +85,7 @@ struct Player
 	void toggleAttacking(HANDLE hProcess, bool attacking);
 	void toggleFlyHack(HANDLE hProcess, bool flyHack);
 	void toggleGhostmode(HANDLE hProcess, bool ghostMode);
-	bool isEnemy(Team localPlayerTeam, GameMode mode);
+	bool isEnemy(Team localPlayerTeam, GameMode mode) const;
 	bool isValid();
 
 };

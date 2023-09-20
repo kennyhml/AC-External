@@ -28,6 +28,4 @@ namespace settings
 	int aimbotMinDistance = 0;
 	int aimbotMaxDistance = 50;
 	int aimbotRadius = 15;
-
-
 }
