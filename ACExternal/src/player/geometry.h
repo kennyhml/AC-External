@@ -44,6 +44,6 @@ struct Collider
 	float width; //0x000C
 };
 
-Vector3 CalculateAngle(Vector3& localPosition, Vector3& enemyPosition);
-float GetDistance(Vector3 localPosition, Vector3 enemyPosition);
+Vector3 CalculateAngle(const Vector3& localPosition, const Vector3& enemyPosition);
+float GetDistance(const Vector3& localPosition, const Vector3& enemyPosition);
 bool WorldToScreen(const Vector3& position, Vector2& screen, float viewMatrix[16], int windowWidth, int windowHeight);
